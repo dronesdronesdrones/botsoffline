@@ -30,18 +30,20 @@ public class SystemStatsLoader {
         this.statsRepository = statsRepository;
     }
 
-//    @PostConstruct
-//    public void init() {
-//        if (solarSystemRepository.count() == 0) {
-//            final List<SolarSystem> systems = requestService.getAllSystemIds().parallelStream()
-//                    .map(requestService::isNullsec)
-//                    .filter(system -> system.getSecurityStatus() <= 0)
-//                    .filter(system -> !system.getName().startsWith("J"))
-//                    .collect(Collectors.toList());
-//            solarSystemRepository.save(systems);
-//            update();
-//        }
-//    }
+    public void initSolarSystems() {
+        if (solarSystemRepository.count() == 0) {
+            log.info("Initializing solar systems.");
+            final List<SolarSystem> systems = requestService.getAllSystemIds().parallelStream()
+                    .map(requestService::isNullsec)
+                    .filter(system -> system.getSecurityStatus() <= 0)
+                    .filter(system -> !system.getName().startsWith("J"))
+                    .collect(Collectors.toList());
+            solarSystemRepository.save(systems);
+            update();
+        } else {
+            log.warn("Skipped solar system initialization as there are more than 0 systems present.");
+        }
+    }
 
     void update() {
         log.debug("Updating solarSystemStats.");
