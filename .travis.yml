@@ -5,7 +5,7 @@ before_install:
 - mv botsoffline.pem /tmp/deploy_key
 language: java
 script:
-- mvn clean package
+- mvn clean package -Pprod
 cache:
   directories:
   - $HOME/.m2
