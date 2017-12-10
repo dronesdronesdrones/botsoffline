@@ -37,10 +37,6 @@ public class ConfigResource {
         this.systemStatsLoader = systemStatsLoader;
     }
 
-    ConfigResource(final String ssoUrl) {
-        SSO_URL = ssoUrl;
-    }
-
     @GetMapping(path = "/ssourl")
     public ResponseEntity<String> getSsoUrl() {
         return new ResponseEntity<>(SSO_URL, HttpStatus.OK);
