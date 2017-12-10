@@ -1,6 +1,23 @@
+before_install:
+- openssl aes-256-cbc -K $encrypted_f1c8072e1ceb_key -iv $encrypted_f1c8072e1ceb_iv -in secrets.tar.enc -out secrets.tar -d
+- tar xvf secrets.tar
+- mv application-prod.yml src/main/resources/config/application-prod.yml
+- mv botsoffline.pem /tmp/deploy_key
 language: java
 script:
 - mvn clean package
 cache:
   directories:
   - $HOME/.m2
+addons:
+  ssh_known_hosts: ec2-52-215-82-30.eu-west-1.compute.amazonaws.com
+before_deploy:
+- eval "$(ssh-agent -s)"
+- chmod 600 /tmp/deploy_key
+- ssh-add /tmp/deploy_key
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: rsync --quiet $TRAVIS_BUILD_DIR/target/botsoffline*.jar ubuntu@ec2-52-215-82-30.eu-west-1.compute.amazonaws.com:~ && ssh-agent -k
+  on:
+    tags: true

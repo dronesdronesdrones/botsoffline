@@ -5,3 +5,5 @@ node_modules
 node
 application-prod.yml
 yarn.lock
+*.pem
+secrets.tar
