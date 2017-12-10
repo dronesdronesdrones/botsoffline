@@ -11,6 +11,7 @@ import com.botsoffline.eve.repository.SolarSystemStatsRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,13 +31,14 @@ public class SystemStatsLoader {
         this.statsRepository = statsRepository;
     }
 
+    @Async
     public void initSolarSystems() {
         if (solarSystemRepository.count() == 0) {
             log.info("Initializing solar systems.");
             final List<SolarSystem> systems = requestService.getAllSystemIds().parallelStream()
                     .map(requestService::isNullsec)
                     .filter(system -> system.getSecurityStatus() <= 0)
-                    .filter(system -> !system.getName().startsWith("J"))
+                    .filter(system -> system.getName().length() < 7)
                     .collect(Collectors.toList());
             solarSystemRepository.save(systems);
             update();

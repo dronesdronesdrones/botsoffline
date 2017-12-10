@@ -1,6 +1,7 @@
 package com.botsoffline.eve.service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class CharacterLocationLoader {
     private final JsonRequestService requestService;
     private final UserRepository userRepository;
     private final SolarSystemRepository solarSystemRepository;
+    private long minutesForUpdate;
 
     public CharacterLocationLoader(final CharacterLocationRepository locationRepository,
             final JsonRequestService requestService, final UserRepository userRepository,
@@ -42,7 +44,9 @@ public class CharacterLocationLoader {
     @Timed
     public void update() {
         log.debug("Updating playerStats.");
-        final List<Long> solarSystemIds = solarSystemRepository.findAll().stream().map(SolarSystem::getSystemId)
+        final Instant before = Instant.now();
+        final List<Long> solarSystemIds = solarSystemRepository.findAll().stream()
+                .map(SolarSystem::getSystemId)
                 .collect(Collectors.toList());
         final List<CharacterLocation> result = userRepository.findAll().stream()
                 .map(this::getLocationStats)
@@ -50,6 +54,8 @@ public class CharacterLocationLoader {
                 .filter(stat -> solarSystemIds.contains(stat.getSystemId()))
                 .collect(Collectors.toList());
         locationRepository.save(result);
+        final Instant after = Instant.now();
+        minutesForUpdate = before.until(after, ChronoUnit.MINUTES);
         log.info("Updated {} playerStats.", result.size());
     }
 
@@ -78,5 +84,9 @@ public class CharacterLocationLoader {
             log.warn("Could not get an access token for {} {}.", user.getLogin(), user.getCharacterId());
             return null;
         }
+    }
+
+    public long getLoginDelay() {
+        return minutesForUpdate <= 2 ? 5 : minutesForUpdate * 2;
     }
 }

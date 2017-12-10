@@ -1,1 +1,12 @@
-<p>Tracker works, go place your alts in null! Check back soon for more details.</p>
+<style>
+    .active {
+        color : green;
+    }
+    .inactive {
+        color : red;
+    }
+</style>
+
+<p *ngIf="isAuthenticated()">Tracking: <span [ngClass]="status">{{status}}</span> <span *ngIf="status === 'active'">({{system}})</span></p>
+<p *ngIf="status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking.</p>
+<p *ngIf="totalMinutes">You have been preventing the bot menace for a total of <b>{{totalMinutes}}</b> minutes.</p>
