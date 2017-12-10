@@ -7,8 +7,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.botsoffline.eve.domain.CharacterLocation;
+import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.User;
 import com.botsoffline.eve.repository.CharacterLocationRepository;
+import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.UserRepository;
 import com.codahale.metrics.annotation.Timed;
 import com.mashape.unirest.http.JsonNode;
@@ -26,20 +28,26 @@ public class CharacterLocationLoader {
     private final CharacterLocationRepository locationRepository;
     private final JsonRequestService requestService;
     private final UserRepository userRepository;
+    private final SolarSystemRepository solarSystemRepository;
 
     public CharacterLocationLoader(final CharacterLocationRepository locationRepository,
-            final JsonRequestService requestService, final UserRepository userRepository) {
+            final JsonRequestService requestService, final UserRepository userRepository,
+            final SolarSystemRepository solarSystemRepository) {
         this.locationRepository = locationRepository;
         this.requestService = requestService;
         this.userRepository = userRepository;
+        this.solarSystemRepository = solarSystemRepository;
     }
 
     @Timed
     public void update() {
         log.debug("Updating playerStats.");
+        final List<Long> solarSystemIds = solarSystemRepository.findAll().stream().map(SolarSystem::getSystemId)
+                .collect(Collectors.toList());
         final List<CharacterLocation> result = userRepository.findAll().stream()
                 .map(this::getLocationStats)
                 .filter(Objects::nonNull)
+                .filter(stat -> solarSystemIds.contains(stat.getSystemId()))
                 .collect(Collectors.toList());
         locationRepository.save(result);
         log.info("Updated {} playerStats.", result.size());
