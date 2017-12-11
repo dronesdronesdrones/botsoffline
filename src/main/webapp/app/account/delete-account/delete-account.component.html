@@ -13,7 +13,7 @@
                 <button type="button" [disabled]="!name.valid" class="btn btn-danger" (click)="deleteAccount()">Delete</button>
             </div>
 
-            <div class="alert alert-danger" *ngIf="submitted && !success">
+            <div class="alert alert-danger" *ngIf="deleteFailed">
                 <strong>Delete failed. Please submit a ticket if the issue persists.</strong>
             </div>
         </div>
