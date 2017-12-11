@@ -18,14 +18,8 @@ import com.botsoffline.eve.security.AuthoritiesConstants;
 import com.botsoffline.eve.service.UserService;
 import com.botsoffline.eve.service.dto.UserDTO;
 import com.botsoffline.eve.web.rest.vm.ManagedUserVM;
-import com.botsoffline.eve.domain.User;
-import com.botsoffline.eve.repository.UserRepository;
-import com.botsoffline.eve.security.AuthoritiesConstants;
-import com.botsoffline.eve.service.UserService;
-import com.botsoffline.eve.service.dto.UserDTO;
 import com.botsoffline.eve.web.rest.util.HeaderUtil;
 import com.botsoffline.eve.web.rest.util.PaginationUtil;
-import com.botsoffline.eve.web.rest.vm.ManagedUserVM;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +98,7 @@ public class UserResource {
         if (existingUser.isPresent() && (!existingUser.get().getId().equals(managedUserVM.getId()))) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "userexists", "Login already in use")).body(null);
         }
-        Optional<UserDTO> updatedUser = userService.updateUser(managedUserVM);
+        Optional<UserDTO> updatedUser = userService.persistUser(managedUserVM);
 
         return ResponseUtil.wrapOrNotFound(updatedUser,
             HeaderUtil.createAlert("A user is updated with identifier " + managedUserVM.getLogin(), managedUserVM.getLogin()));

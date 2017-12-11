@@ -41,6 +41,7 @@ public class SystemStatsLoader {
                     .filter(system -> system.getName().length() < 7)
                     .collect(Collectors.toList());
             solarSystemRepository.save(systems);
+            log.info("Added nullsec systems. Continuing with stats.");
             update();
         } else {
             log.warn("Skipped solar system initialization as there are more than 0 systems present.");

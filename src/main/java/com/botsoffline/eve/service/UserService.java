@@ -15,8 +15,11 @@ import java.util.stream.Collectors;
 
 import com.botsoffline.eve.config.Constants;
 import com.botsoffline.eve.domain.Authority;
+import com.botsoffline.eve.domain.CharacterLocation;
 import com.botsoffline.eve.domain.User;
+import com.botsoffline.eve.domain.enums.TrackingStatus;
 import com.botsoffline.eve.repository.AuthorityRepository;
+import com.botsoffline.eve.repository.CharacterLocationRepository;
 import com.botsoffline.eve.repository.UserRepository;
 import com.botsoffline.eve.security.AuthoritiesConstants;
 import com.botsoffline.eve.security.SecurityUtils;
@@ -37,11 +40,15 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+    private final CharacterLocationRepository locationRepository;
 
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
+    public UserService(final UserRepository userRepository,
+            final CharacterLocationRepository locationRepository,
+            final AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
+        this.locationRepository = locationRepository;
         this.authorityRepository = authorityRepository;
     }
 
@@ -54,6 +61,7 @@ public class UserService {
         newUser.setCharacterId(characterId);
         newUser.setCharacterOwnerHash(characterOwnerHash);
         newUser.setRefreshToken(refreshToken);
+        newUser.setTrackingStatus(TrackingStatus.ENABLED);
         // new user gets registration key
         authorities.add(authority);
         newUser.setAuthorities(authorities);
@@ -69,7 +77,7 @@ public class UserService {
      * @param userDTO user to update
      * @return updated user
      */
-    public Optional<UserDTO> updateUser(UserDTO userDTO) {
+    public Optional<UserDTO> persistUser(UserDTO userDTO) {
         return Optional.of(userRepository
             .findOne(userDTO.getId()))
             .map(user -> {
@@ -87,8 +95,12 @@ public class UserService {
             .map(UserDTO::new);
     }
 
-    public void deleteUser(String login) {
+    public void deleteUser(final String login) {
         userRepository.findOneByLogin(login).ifPresent(user -> {
+            final List<CharacterLocation> locations = locationRepository.findAllByCharacterId(user.getCharacterId())
+                    .stream().peek(location -> location.setCharacterId(0))
+                    .collect(Collectors.toList());
+            locationRepository.save(locations);
             userRepository.delete(user);
             log.debug("Deleted User: {}", user);
         });
@@ -115,5 +127,9 @@ public class UserService {
      */
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
+    }
+
+    public void persistUser(final User user) {
+        userRepository.save(user);
     }
 }

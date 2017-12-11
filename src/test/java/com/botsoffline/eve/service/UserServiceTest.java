@@ -2,8 +2,11 @@ package com.botsoffline.eve.service;
 
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+
 import com.botsoffline.eve.domain.User;
 import com.botsoffline.eve.repository.AuthorityRepository;
+import com.botsoffline.eve.repository.CharacterLocationRepository;
 import com.botsoffline.eve.repository.UserRepository;
 
 import org.junit.Test;
@@ -11,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -21,7 +25,8 @@ public class UserServiceTest {
 
     private AuthorityRepository authRepo = mock(AuthorityRepository.class);
     private UserRepository userRepo = mock(UserRepository.class);
-    private UserService sut = new UserService(userRepo, authRepo);
+    private CharacterLocationRepository locationRepository = mock(CharacterLocationRepository.class);
+    private UserService sut = new UserService(userRepo, locationRepository, authRepo);
     private String characterOwnerHash = "1";
 
     @Test
@@ -40,6 +45,7 @@ public class UserServiceTest {
     public void deleteUser() throws Exception {
         User user = new User();
         when(userRepo.findOneByLogin(anyString())).thenReturn(Optional.of(user));
+        when(locationRepository.findAllByCharacterId(anyLong())).thenReturn(emptyList());
 
         sut.deleteUser("");
 
@@ -49,6 +55,7 @@ public class UserServiceTest {
     @Test
     public void deleteUser_withoutResult() throws Exception {
         when(userRepo.findOneByLogin(anyString())).thenReturn(Optional.empty());
+        when(locationRepository.findAllByCharacterId(anyLong())).thenReturn(emptyList());
 
         sut.deleteUser("");
 

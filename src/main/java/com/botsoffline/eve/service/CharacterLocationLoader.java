@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.botsoffline.eve.domain.CharacterLocation;
 import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.User;
+import com.botsoffline.eve.domain.enums.TrackingStatus;
 import com.botsoffline.eve.repository.CharacterLocationRepository;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.UserRepository;
@@ -48,8 +49,8 @@ public class CharacterLocationLoader {
         final List<Long> solarSystemIds = solarSystemRepository.findAll().stream()
                 .map(SolarSystem::getSystemId)
                 .collect(Collectors.toList());
-        final List<CharacterLocation> result = userRepository.findAll().stream()
-                .map(this::getLocationStats)
+        final List<CharacterLocation> result = userRepository.findAllByTrackingStatus(TrackingStatus.ENABLED)
+                .stream().map(this::getLocationStats)
                 .filter(Objects::nonNull)
                 .filter(stat -> solarSystemIds.contains(stat.getSystemId()))
                 .collect(Collectors.toList());

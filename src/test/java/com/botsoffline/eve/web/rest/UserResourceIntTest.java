@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.botsoffline.eve.App;
 import com.botsoffline.eve.domain.User;
+import com.botsoffline.eve.domain.enums.TrackingStatus;
 import com.botsoffline.eve.repository.UserRepository;
 import com.botsoffline.eve.service.UserService;
 import com.botsoffline.eve.service.mapper.UserMapper;
@@ -144,14 +145,14 @@ public class UserResourceIntTest {
         Set<String> authorities = new HashSet<>();
         authorities.add("ROLE_USER");
         ManagedUserVM managedUserVM = new ManagedUserVM(
-            updatedUser.getId(),
-            updatedUser.getLogin(),
-            updatedUser.getActivated(),
-            updatedUser.getCreatedBy(),
-            updatedUser.getCreatedDate(),
-            updatedUser.getLastModifiedBy(),
-            updatedUser.getLastModifiedDate(),
-            authorities);
+                updatedUser.getId(),
+                updatedUser.getLogin(),
+                updatedUser.getActivated(),
+                updatedUser.getCreatedBy(),
+                updatedUser.getCreatedDate(),
+                updatedUser.getLastModifiedBy(),
+                updatedUser.getLastModifiedDate(),
+                authorities, TrackingStatus.ENABLED);
 
         restUserMockMvc.perform(put("/api/users")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -183,7 +184,7 @@ public class UserResourceIntTest {
             updatedUser.getCreatedDate(),
             updatedUser.getLastModifiedBy(),
             updatedUser.getLastModifiedDate(),
-            authorities);
+            authorities, TrackingStatus.ENABLED);
 
         restUserMockMvc.perform(put("/api/users")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -220,7 +221,7 @@ public class UserResourceIntTest {
             updatedUser.getCreatedDate(),
             updatedUser.getLastModifiedBy(),
             updatedUser.getLastModifiedDate(),
-            authorities);
+            authorities, TrackingStatus.ENABLED);
 
         restUserMockMvc.perform(put("/api/users")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)

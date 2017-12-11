@@ -7,11 +7,11 @@
 
 package com.botsoffline.eve.web.rest.vm;
 
-import com.botsoffline.eve.service.dto.UserDTO;
-import com.botsoffline.eve.service.dto.UserDTO;
-
 import java.time.Instant;
 import java.util.Set;
+
+import com.botsoffline.eve.domain.enums.TrackingStatus;
+import com.botsoffline.eve.service.dto.UserDTO;
 
 /**
  * View Model extending the UserDTO, which is meant to be used in the user management UI.
@@ -24,8 +24,8 @@ public class ManagedUserVM extends UserDTO {
 
     public ManagedUserVM(String id, String login, boolean activated,
                          String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate,
-                        Set<String> authorities) {
-        super(id, login, activated, createdBy, createdDate, lastModifiedBy, lastModifiedDate,  authorities);
+                        Set<String> authorities, TrackingStatus trackingStatus) {
+        super(id, login, activated, createdBy, createdDate, lastModifiedBy, lastModifiedDate,  authorities, trackingStatus);
     }
 
     @Override

@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 
 import com.botsoffline.eve.domain.Authority;
 import com.botsoffline.eve.domain.User;
-import com.botsoffline.eve.domain.Authority;
-import com.botsoffline.eve.domain.User;
+import com.botsoffline.eve.domain.enums.TrackingStatus;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -28,7 +27,7 @@ public class UserDTO {
     @NotBlank
     private String login;
 
-    private boolean activated = false;
+    private boolean activated;
 
     private String createdBy;
 
@@ -39,6 +38,7 @@ public class UserDTO {
     private Instant lastModifiedDate;
 
     private Set<String> authorities;
+    private TrackingStatus trackingStatus;
 
     public UserDTO() {
         // Empty constructor needed for Jackson.
@@ -48,12 +48,12 @@ public class UserDTO {
         this(user.getId(), user.getLogin(), user.getActivated(),
             user.getCreatedBy(), user.getCreatedDate(), user.getLastModifiedBy(), user.getLastModifiedDate(),
             user.getAuthorities().stream().map(Authority::getName)
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet()), user.getTrackingStatus());
     }
 
     public UserDTO(String id, String login, boolean activated,
         String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate,
-        Set<String> authorities) {
+        Set<String> authorities, TrackingStatus trackingStatus) {
 
         this.id = id;
         this.login = login;
@@ -63,6 +63,15 @@ public class UserDTO {
         this.lastModifiedBy = lastModifiedBy;
         this.lastModifiedDate = lastModifiedDate;
         this.authorities = authorities;
+        this.trackingStatus = trackingStatus;
+    }
+
+    public TrackingStatus getTrackingStatus() {
+        return trackingStatus;
+    }
+
+    public void setTrackingStatus(final TrackingStatus trackingStatus) {
+        this.trackingStatus = trackingStatus;
     }
 
     public String getId() {

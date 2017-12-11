@@ -15,6 +15,7 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
+import com.botsoffline.eve.domain.enums.TrackingStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.springframework.data.annotation.Id;
@@ -52,6 +53,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private String refreshToken;
     private Instant accessTokenExpiry;
     private String accessToken;
+    private TrackingStatus trackingStatus;
 
     public String getId() {
         return id;
@@ -149,5 +151,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setAccessToken(final String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public void setTrackingStatus(final TrackingStatus trackingStatus) {
+        this.trackingStatus = trackingStatus;
+    }
+
+    public TrackingStatus getTrackingStatus() {
+        return trackingStatus;
     }
 }

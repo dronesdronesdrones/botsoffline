@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import com.botsoffline.eve.domain.Authority;
 import com.botsoffline.eve.domain.User;
+import com.botsoffline.eve.domain.enums.TrackingStatus;
 import com.botsoffline.eve.security.AuthoritiesConstants;
 import com.botsoffline.eve.service.dto.UserDTO;
 
@@ -51,14 +52,15 @@ public class UserMapperTest {
     @Test
     public void testUserDTOtoUser() {
         UserDTO userDTO = new UserDTO(
-            DEFAULT_ID,
-            DEFAULT_LOGIN,
-            true,
-            DEFAULT_LOGIN,
-            null,
-            DEFAULT_LOGIN,
-            null,
-            Stream.of(AuthoritiesConstants.USER).collect(Collectors.toSet()));
+                DEFAULT_ID,
+                DEFAULT_LOGIN,
+                true,
+                DEFAULT_LOGIN,
+                null,
+                DEFAULT_LOGIN,
+                null,
+                Stream.of(AuthoritiesConstants.USER).collect(Collectors.toSet()),
+                TrackingStatus.ENABLED);
         User user = sut.userDTOToUser(userDTO);
         assertThat(user.getId()).isEqualTo(DEFAULT_ID);
         assertThat(user.getLogin()).isEqualTo(DEFAULT_LOGIN);

@@ -6,7 +6,29 @@
         color : red;
     }
 </style>
-
-<p *ngIf="isAuthenticated()">Tracking: <span [ngClass]="status">{{status}}</span> <span *ngIf="status === 'active'">({{system}})</span></p>
-<p *ngIf="status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking.</p>
-<p *ngIf="totalMinutes">You have been preventing the bot menace for a total of <b>{{totalMinutes}}</b> minutes.</p>
+<div *ngIf="!isAuthenticated()" class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-4">Got an alt to spare?</h1>
+        <p>Let's make ratting bots worthless, by camping systems that are likely to be inhabited by bots.</p>
+        <p>Based on the idea of <a href="https://www.reddit.com/r/Eve/comments/7i5lih/prothean_alliance_are_blatantly_botting_and/dqwcl5x/" target="_blank">u/rich000</a> and <a href="http://evebotdetector.azurewebsites.net/" target="_blank">evebotdetector</a> this app provides recommendations in which systems you can camp or hunt, and let you compete with other contributors.
+        Place an alt somewhere, let us track your location and get space fame points! Don't worry: You can disable the tracking
+        or remove all of your data at any time.</p>
+        <p>With the data that you collect we will eventually be able to directly report bots to CCP.</p>
+        <p>Thank you for your help in making New Eden a better place!</p>
+        <h2>Please Sign In</h2>
+        <a class="nav-link" href="{{ssoUrl}}">
+            <img src="https://images.contentful.com/idjq7aai9ylm/12vrPsIMBQi28QwCGOAqGk/33234da7672c6b0cdca394fc8e0b1c2b/EVE_SSO_Login_Buttons_Small_Black.png?w=195&h=30"/>
+        </a>
+    </div>
+</div>
+<div *ngIf="account && isAuthenticated()">
+    <p>
+        Tracking:
+        <span *ngIf="account.trackingStatus === 'ENABLED'" [ngClass]="status">{{status}}</span>
+        <span *ngIf="account.trackingStatus === 'DISABLED'" class="inactive">disabled</span>
+        <span *ngIf="account.trackingStatus === 'ENABLED' && status === 'active'">({{system}})</span>
+    </p>
+    <div class="alert alert-warning" *ngIf="account.trackingStatus === 'DISABLED'">Please visit Account > Tracking to enable tracking.</div>
+    <div class="alert alert-warning" *ngIf="account.trackingStatus === 'ENABLED' && status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking.</div>
+    <p *ngIf="totalMinutes">You have been preventing the botting menace for a total of <b>{{totalMinutes}}</b> minutes.</p>
+</div>

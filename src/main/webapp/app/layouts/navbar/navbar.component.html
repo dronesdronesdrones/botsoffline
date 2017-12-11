@@ -1,10 +1,10 @@
-<nav class="navbar navbar-inverse navbar-expand-md jh-navbar">
+<nav class="navbar navbar-expand-lg navbar-light bg-light jh-navbar">
     <div class="jh-logo-container float-left">
         <a class="jh-navbar-toggler hidden-lg-up float-right" href="javascript:void(0);" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" (click)="toggleNavbar()">
             <i class="fa fa-bars"></i>
         </a>
         <a class="navbar-brand logo float-left" routerLink="/" (click)="collapseNavbar()">
-            <span class="navbar-title">BotsOffline</span> <span class="navbar-version">{{version}}</span>
+            <span>BotsOffline</span>
         </a>
     </div>
     <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
@@ -80,13 +80,21 @@
             <li *ngSwitchCase="true" ngbDropdown class="nav-item dropdown pointer" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
                 <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu">
                   <span *ngIf="!getImageUrl()">
-                    <i class="fa fa-user" aria-hidden="true"></i>
-                    <span *ngIf="userName">{{userName}}</span>
-                    <span *ngIf="!userName">Account</span>
+                    <span>Account</span>
                     <b class="caret"></b>
                   </span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right" ngbDropdownMenu>
+                    <li>
+                        <a class="dropdown-item" routerLink="disable-tracking" routerLinkActive="active" (click)="collapseNavbar()">
+                            <span>Tracking</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="delete-account" routerLinkActive="active" (click)="collapseNavbar()">
+                            <span>Delete Account</span>
+                        </a>
+                    </li>
                     <li>
                         <a class="dropdown-item" (click)="logout()" id="logout">
                             <i class="fa fa-fw fa-sign-out" aria-hidden="true"></i>
@@ -94,11 +102,6 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-            <li *ngSwitchCase="false" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                <a class="nav-link" href="{{ssoUrl}}">
-                    <img src="https://images.contentful.com/idjq7aai9ylm/12vrPsIMBQi28QwCGOAqGk/33234da7672c6b0cdca394fc8e0b1c2b/EVE_SSO_Login_Buttons_Small_Black.png?w=195&h=30"/>
-                </a>
             </li>
         </ul>
     </div>

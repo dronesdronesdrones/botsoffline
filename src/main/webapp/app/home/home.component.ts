@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Account, Principal } from '../shared';
+import {Account, ConfigService, Principal} from '../shared';
 import {Http} from "@angular/http";
 
 @Component({
@@ -16,27 +16,34 @@ export class HomeComponent implements OnInit {
     status: string;
     system: string;
     totalMinutes: number;
+    ssoUrl: string;
 
     constructor(
         private principal: Principal,
         private eventManager: JhiEventManager,
-        private http: Http
+        private http: Http,
+        private configService: ConfigService
     ) {
     }
 
     ngOnInit() {
         this.principal.identity().then((account) => {
             this.account = account;
-            this.loadStats();
+            if (account) {
+                this.loadStats();
+            }
         });
         this.registerAuthenticationSuccess();
+        this.configService.getSsoUrl().subscribe((data) => this.ssoUrl = data);
     }
 
     registerAuthenticationSuccess() {
         this.eventManager.subscribe('authenticationSuccess', (message) => {
             this.principal.identity().then((account) => {
                 this.account = account;
-                this.loadStats();
+                if (account) {
+                    this.loadStats();
+                }
             });
         });
     }
@@ -45,28 +52,20 @@ export class HomeComponent implements OnInit {
         this.http.get("/api/player/current-status").subscribe(
                 (data) => {
                     const status = data.status;
-                    console.log(data.json());
                     if (status === 200) {
                         this.status = 'active';
                         this.system = data.json().name;
                     } else if (status === 204) {
                         this.status = 'inactive';
                     }
-                },
-                (err) => {
-                    alert("Failed to load your user. Please submit a ticket if this persists.")
                 }
         );
         this.http.get("/api/player/total-minutes").subscribe(
                 (data) => {
                     this.totalMinutes = +data.text();
-                },
-                (err) => {
-                    alert("Failed to load your user. Please submit a ticket if this persists.")
                 }
         );
     }
-
 
     isAuthenticated() {
         return this.principal.isAuthenticated();

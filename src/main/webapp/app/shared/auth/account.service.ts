@@ -10,7 +10,11 @@ export class AccountService  {
         return this.http.get('api/account').map((res: Response) => res.json());
     }
 
-    // save(account: any): Observable<Response> {
-    //     return this.http.post('api/account', account);
-    // }
+    changeTracking(status: string): Observable<any> {
+        return this.http.put('api/account/tracking/' + status, null);
+    }
+
+    delete() {
+        return this.http.delete('api/account');
+    }
 }

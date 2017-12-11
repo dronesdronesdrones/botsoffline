@@ -4,7 +4,8 @@ import { RouterModule } from '@angular/router';
 import { BotsOfflineSharedModule } from '../shared';
 
 import {
-    SettingsComponent,
+    DeleteAccountComponent,
+    DisableTrackingComponent,
     accountState
 } from './';
 
@@ -14,7 +15,8 @@ import {
         RouterModule.forRoot(accountState, { useHash: true })
     ],
     declarations: [
-        SettingsComponent
+        DeleteAccountComponent,
+        DisableTrackingComponent
     ],
     providers: [
     ],
