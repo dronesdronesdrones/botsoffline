@@ -2,6 +2,7 @@ package com.botsoffline.eve.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.botsoffline.eve.domain.SolarSystem;
@@ -53,22 +54,44 @@ public class SystemStatsLoader {
         log.debug("Updating solarSystemStats.");
         final List<Long> systemIds = solarSystemRepository.findAll().parallelStream().map(SolarSystem::getSystemId)
                 .collect(Collectors.toList());
-        final List<SovInfo> sovInfos = requestService.getSovInformation();
         final List<SolarSystemStats> result = requestService.getSolarSystemStats().stream()
                 .filter(e -> isValidSystem(e, systemIds))
-                .peek(e -> setSovInfoIfAvailable(e, sovInfos))
                 .collect(Collectors.toList());
         statsRepository.save(result);
         log.info("Updated solarSystemStats.");
     }
 
-    private void setSovInfoIfAvailable(final SolarSystemStats stats, final Iterable<SovInfo> sovInfos) {
+    void updateSov() {
+        final List<SovInfo> sovInfos = requestService.getSovInformation();
+        final List<SolarSystem> systems = solarSystemRepository.findAll().stream()
+                .map(e -> {
+                    boolean updated = setSovInfoIfAvailable(e, sovInfos);
+                    return updated ? e : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        solarSystemRepository.save(systems);
+    }
+
+    /**
+     * Returns true if the sov was updated.
+     *
+     * @param system
+     * @param sovInfos
+     * @return
+     */
+    private boolean setSovInfoIfAvailable(final SolarSystem system, final Iterable<SovInfo> sovInfos) {
         for (final SovInfo sovInfo : sovInfos) {
-            if (stats.getSystemId() == sovInfo.getSystemId()) {
-                stats.setSovHoldingAlliance(sovInfo.getAllianceId());
-                return;
+            if (system.getSystemId() == sovInfo.getSystemId()) {
+                if (system.getSovHoldingAlliance() != null && system.getSovHoldingAlliance() != sovInfo.getAllianceId()) {
+                    system.setSovHoldingAlliance(sovInfo.getAllianceId());
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
+        return false;
     }
 
     private boolean isValidSystem(final SolarSystemStats system, final Collection<Long> systemIds) {

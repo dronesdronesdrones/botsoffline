@@ -33,6 +33,12 @@ public class TriggerMachine {
     }
 
     @Async
+    @Scheduled(cron = "0 0 * * * *")
+    public void updateSov() {
+        systemStatsLoader.update();
+    }
+
+    @Async
     @Scheduled(fixedDelay = 60_000L)
     public void loadPlayerStats() {
         playerStatsLoader.update();

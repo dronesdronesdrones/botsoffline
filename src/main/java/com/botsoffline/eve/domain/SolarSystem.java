@@ -16,6 +16,7 @@ public class SolarSystem {
     private String name;
     private double securityStatus;
     private long constellationId;
+    private Long sovHoldingAlliance;
 
     public SolarSystem() {
     }
@@ -26,6 +27,14 @@ public class SolarSystem {
         this.name = name;
         this.securityStatus = securityStatus;
         this.constellationId = constellationId;
+    }
+
+    public Long getSovHoldingAlliance() {
+        return sovHoldingAlliance;
+    }
+
+    public void setSovHoldingAlliance(final Long sovHoldingAlliance) {
+        this.sovHoldingAlliance = sovHoldingAlliance;
     }
 
     public Long getSystemId() {
