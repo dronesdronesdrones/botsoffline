@@ -62,7 +62,11 @@ public class CharacterLocationLoader {
 
     private CharacterLocation getLocationStats(final User user) {
         final String accessToken = getAccessToken(user);
-        return requestService.getLocationIfOnline(user.getCharacterId(), accessToken);
+        if (null != accessToken) {
+            return requestService.getLocationIfOnline(user.getCharacterId(), accessToken);
+        } else {
+            return null;
+        }
     }
 
     private String getAccessToken(final User user) {
@@ -82,7 +86,9 @@ public class CharacterLocationLoader {
             userRepository.save(user);
             return accessToken;
         } else {
-            log.warn("Could not get an access token for {} {}.", user.getLogin(), user.getCharacterId());
+            log.warn("Could not get an access token for {} {}. Deleting the user so he has to create a new refresh "
+                     + "token.", user.getLogin(), user.getCharacterId());
+            userRepository.delete(user.getId());
             return null;
         }
     }

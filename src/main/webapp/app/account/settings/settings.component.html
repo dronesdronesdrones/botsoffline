@@ -1,0 +1,40 @@
+<div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2>Location Tracking</h2>
+            <p>While we will never tell anyone about your location or login status, you can disable the tracking here.</p>
+            <p *ngIf="account">Tracking is currently <b style="color: green" *ngIf="account.trackingStatus === 'ENABLED'">enabled</b><b style="color: red" *ngIf="account.trackingStatus === 'DISABLED'">disabled</b>.</p>
+
+            <div class="alert alert-success" *ngIf="changeTrackingSubmitted && changeTrackingSuccess">
+                <strong>Settings saved!</strong>
+            </div>
+
+            <div class="alert alert-danger" *ngIf="changeTrackingSubmitted && !changeTrackingSuccess">
+                <strong>Update failed. Please submit a ticket if the issue persists.</strong>
+            </div>
+
+            <button *ngIf="account.trackingStatus === 'ENABLED'" type="button" class="btn btn-danger" (click)="changeTracking('DISABLED')">Disable</button>
+            <button *ngIf="account.trackingStatus === 'DISABLED'" type="button" class="btn btn-success" (click)="changeTracking('ENABLED')">Enable</button>
+        </div>
+    </div>
+    <hr/>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2>Delete Account</h2>
+            <p>Deleting your account will remove all details we have about you, including SSO tokens and your score. Location data will be anonymised.</p>
+            <p><b>This action cannot be undone!</b></p>
+            <p *ngIf="account">Enter your character name '{{account.login}}' to continue.</p>
+            <div *ngIf="account" class="input-group">
+                <input type="text" class="form-control" id="name"
+                       required pattern="{{account.login}}"
+                       [(ngModel)]="characterNameConfirm" name="name"
+                       #name="ngModel">
+                <button type="button" [disabled]="!name.valid" class="btn btn-danger" (click)="deleteAccount()">Delete</button>
+            </div>
+
+            <div class="alert alert-danger" *ngIf="accountDeleteFailed">
+                <strong>Delete failed. Please submit a ticket if the issue persists.</strong>
+            </div>
+        </div>
+    </div>
+</div>

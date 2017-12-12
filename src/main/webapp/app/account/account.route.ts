@@ -1,13 +1,11 @@
 import { Routes } from '@angular/router';
 
 import {
-    disableTrackingRoute,
-    deleteAccountRoute
+    settingsRoute,
 } from './';
 
 const ACCOUNT_ROUTES = [
-    disableTrackingRoute,
-    deleteAccountRoute
+    settingsRoute,
 ];
 
 export const accountState: Routes = [{
