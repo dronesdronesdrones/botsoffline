@@ -41,15 +41,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CharacterLocationRepository locationRepository;
-
     private final AuthorityRepository authorityRepository;
+    private final JsonRequestService requestService;
 
     public UserService(final UserRepository userRepository,
             final CharacterLocationRepository locationRepository,
-            final AuthorityRepository authorityRepository) {
+            final AuthorityRepository authorityRepository,
+            final JsonRequestService requestService) {
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.authorityRepository = authorityRepository;
+        this.requestService = requestService;
     }
 
     public User createUser(final String login, final Long characterId, final String characterOwnerHash,
@@ -122,14 +124,42 @@ public class UserService {
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).orElse(null);
     }
 
-    /**
-     * @return a list of all the authorities
-     */
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
     }
 
     public void persistUser(final User user) {
         userRepository.save(user);
+    }
+
+    public void initAffiliations() {
+        final List<User> collect = userRepository.findAllByCorporationIdIsNull().stream()
+                .peek(this::setCorporationAndAlliance)
+                .filter(user -> user.getCorporationId() != null)
+                .collect(Collectors.toList());
+        userRepository.save(collect);
+        log.info("Initiated affiliations for {} characters.", collect.size());
+    }
+
+    public void updateAffiliations() {
+        final List<User> collect = userRepository.findAll().stream()
+                .peek(this::setCorporationAndAlliance)
+                .filter(user -> user.getCorporationId() != null)
+                .collect(Collectors.toList());
+        userRepository.save(collect);
+        log.info("Updated affiliations for {} characters.", collect.size());
+    }
+
+    private void setCorporationAndAlliance(final User user) {
+        final Long corporationId = requestService.getCorporationId(user.getCharacterId());
+        if (null != corporationId) {
+            user.setCorporationId(corporationId);
+            final Long allianceId = requestService.getAllianceId(corporationId);
+            if (null != allianceId) {
+                user.setAllianceId(allianceId);
+            }
+        } else {
+            log.warn("Could not load the corporation of user {} {}.", user.getLogin(), user.getCharacterId());
+        }
     }
 }

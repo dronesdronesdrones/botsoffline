@@ -12,11 +12,13 @@ public class TriggerMachine {
 
     private final SystemStatsLoader systemStatsLoader;
     private final CharacterLocationLoader playerStatsLoader;
+    private final UserService userService;
 
     public TriggerMachine(final SystemStatsLoader systemStatsLoader,
-            final CharacterLocationLoader playerStatsLoader) {
+            final CharacterLocationLoader playerStatsLoader, final UserService userService) {
         this.systemStatsLoader = systemStatsLoader;
         this.playerStatsLoader = playerStatsLoader;
+        this.userService = userService;
     }
 
     @PostConstruct
@@ -35,4 +37,17 @@ public class TriggerMachine {
     public void loadPlayerStats() {
         playerStatsLoader.update();
     }
+
+    @Async
+    @Scheduled(fixedDelay = 30000)
+    public void initAffiliations() {
+        userService.initAffiliations();
+    }
+
+    @Async
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updateAffiliations() {
+        userService.updateAffiliations();
+    }
+
 }

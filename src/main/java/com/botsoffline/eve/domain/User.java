@@ -40,6 +40,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @NotNull
     private Long characterId;
+    private Long corporationId;
+    private Long allianceId;
 
     private boolean activated = true;
 
@@ -55,6 +57,22 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private String accessToken;
     private TrackingStatus trackingStatus;
     private Boolean hideFromLeaderboard;
+
+    public Long getCorporationId() {
+        return corporationId;
+    }
+
+    public void setCorporationId(final Long corporationId) {
+        this.corporationId = corporationId;
+    }
+
+    public Long getAllianceId() {
+        return allianceId;
+    }
+
+    public void setAllianceId(final Long allianceId) {
+        this.allianceId = allianceId;
+    }
 
     public String getId() {
         return id;

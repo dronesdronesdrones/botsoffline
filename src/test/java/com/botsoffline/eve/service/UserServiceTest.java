@@ -26,7 +26,8 @@ public class UserServiceTest {
     private AuthorityRepository authRepo = mock(AuthorityRepository.class);
     private UserRepository userRepo = mock(UserRepository.class);
     private CharacterLocationRepository locationRepository = mock(CharacterLocationRepository.class);
-    private UserService sut = new UserService(userRepo, locationRepository, authRepo);
+    private JsonRequestService requestService = new JsonRequestService();
+    private UserService sut = new UserService(userRepo, locationRepository, authRepo, requestService);
     private String characterOwnerHash = "1";
 
     @Test

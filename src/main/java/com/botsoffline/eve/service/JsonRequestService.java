@@ -209,4 +209,21 @@ public class JsonRequestService {
     public void setClientSecret(final String clientSecret) {
         this.clientSecret = clientSecret;
     }
+
+    Long getCorporationId(final long characterId) {
+        final String url = String.format("%s/v4/characters/%d", ESI_BASE_URL, characterId);
+        return justGet(url)
+                .map(response -> response.getObject().getLong("corporation_id"))
+                .orElse(null);
+    }
+
+    Long getAllianceId(final long corporationId) {
+        final String url = String.format("%s/v3/corporations/%d", ESI_BASE_URL, corporationId);
+        return justGet(url)
+                .map(response -> {
+                    final JSONObject obj = response.getObject();
+                    return obj.has("alliance_id") ? obj.getLong("alliance_id") : null;
+                })
+                .orElse(null);
+    }
 }
