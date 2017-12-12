@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.botsoffline.eve.domain.CharacterLocation;
 import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.SolarSystemStats;
+import com.botsoffline.eve.domain.SovInfo;
 import com.botsoffline.eve.domain.Token;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -225,5 +226,23 @@ public class JsonRequestService {
                     return obj.has("alliance_id") ? obj.getLong("alliance_id") : null;
                 })
                 .orElse(null);
+    }
+
+    List<SovInfo> getSovInformation() {
+        final String url = String.format("%s/v1/sovereignty/map/", ESI_BASE_URL);
+        return justGet(url)
+                .map(response -> extractSovForAlliances(response.getArray()))
+                .orElse(null);
+    }
+
+    private List<SovInfo> extractSovForAlliances(final JSONArray array) {
+        final List<SovInfo> result = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            final JSONObject obj = array.getJSONObject(i);
+            if (obj.has("alliance_id")) {
+                result.add(new SovInfo(obj.getLong("system_id"), obj.getLong("alliance_id")));
+            }
+        }
+        return result;
     }
 }

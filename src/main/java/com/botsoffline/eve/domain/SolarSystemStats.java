@@ -15,6 +15,7 @@ public class SolarSystemStats {
     private int npcKills;
     private int podKills;
     private Instant instant;
+    private Long sovHoldingAlliance;
 
     public SolarSystemStats() {
     }
@@ -25,6 +26,14 @@ public class SolarSystemStats {
         this.npcKills = npcKills;
         this.podKills = podKills;
         instant = Instant.now();
+    }
+
+    public long getSovHoldingAlliance() {
+        return sovHoldingAlliance;
+    }
+
+    public void setSovHoldingAlliance(final long sovHoldingAlliance) {
+        this.sovHoldingAlliance = sovHoldingAlliance;
     }
 
     public long getSystemId() {

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.SolarSystemStats;
+import com.botsoffline.eve.domain.SovInfo;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.SolarSystemStatsRepository;
 
@@ -52,11 +53,22 @@ public class SystemStatsLoader {
         log.debug("Updating solarSystemStats.");
         final List<Long> systemIds = solarSystemRepository.findAll().parallelStream().map(SolarSystem::getSystemId)
                 .collect(Collectors.toList());
-        final List<SolarSystemStats> result = requestService.getSolarSystemStats().parallelStream()
+        final List<SovInfo> sovInfos = requestService.getSovInformation();
+        final List<SolarSystemStats> result = requestService.getSolarSystemStats().stream()
                 .filter(e -> isValidSystem(e, systemIds))
+                .peek(e -> setSovInfoIfAvailable(e, sovInfos))
                 .collect(Collectors.toList());
         statsRepository.save(result);
         log.info("Updated solarSystemStats.");
+    }
+
+    private void setSovInfoIfAvailable(final SolarSystemStats stats, final Iterable<SovInfo> sovInfos) {
+        for (final SovInfo sovInfo : sovInfos) {
+            if (stats.getSystemId() == sovInfo.getSystemId()) {
+                stats.setSovHoldingAlliance(sovInfo.getAllianceId());
+                return;
+            }
+        }
     }
 
     private boolean isValidSystem(final SolarSystemStats system, final Collection<Long> systemIds) {
