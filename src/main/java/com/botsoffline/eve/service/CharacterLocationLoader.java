@@ -1,16 +1,20 @@
 package com.botsoffline.eve.service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.botsoffline.eve.domain.Activity;
 import com.botsoffline.eve.domain.CharacterLocation;
 import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.User;
 import com.botsoffline.eve.domain.enums.TrackingStatus;
+import com.botsoffline.eve.repository.ActivityRepository;
 import com.botsoffline.eve.repository.CharacterLocationRepository;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.UserRepository;
@@ -30,15 +34,18 @@ public class CharacterLocationLoader {
     private final CharacterLocationRepository locationRepository;
     private final JsonRequestService requestService;
     private final UserRepository userRepository;
+    private final ActivityRepository activityRepository;
     private final SolarSystemRepository solarSystemRepository;
     private long minutesForUpdate;
 
     public CharacterLocationLoader(final CharacterLocationRepository locationRepository,
             final JsonRequestService requestService, final UserRepository userRepository,
+            final ActivityRepository activityRepository,
             final SolarSystemRepository solarSystemRepository) {
         this.locationRepository = locationRepository;
         this.requestService = requestService;
         this.userRepository = userRepository;
+        this.activityRepository = activityRepository;
         this.solarSystemRepository = solarSystemRepository;
     }
 
@@ -49,15 +56,32 @@ public class CharacterLocationLoader {
         final List<Long> solarSystemIds = solarSystemRepository.findAll().stream()
                 .map(SolarSystem::getSystemId)
                 .collect(Collectors.toList());
+        final List<Activity> activities = activityRepository.findAllByDate(LocalDate.now());
         final List<CharacterLocation> result = userRepository.findAllByTrackingStatus(TrackingStatus.ENABLED)
                 .stream().map(this::getLocationStats)
                 .filter(Objects::nonNull)
                 .filter(stat -> solarSystemIds.contains(stat.getSystemId()))
+                .peek(location -> extendActivities(location, activities))
                 .collect(Collectors.toList());
         locationRepository.save(result);
+        activityRepository.save(activities);
         final Instant after = Instant.now();
         minutesForUpdate = before.until(after, ChronoUnit.MINUTES);
         log.info("Updated {} playerStats.", result.size());
+    }
+
+    private void extendActivities(final CharacterLocation location, final Collection<Activity> activities) {
+        final Optional<Activity> optional = activities.stream()
+                .filter(a -> a.getCharacterId() == location.getCharacterId()
+                       && a.getSystemId() == location.getSystemId())
+                .findFirst();
+        // todo: score modifier
+        if (optional.isPresent()) {
+            optional.get().addOneMinute();
+        } else {
+            activities.add(new Activity(location.getCharacterId(), location.getSystemId(), 1,
+                                        null, LocalDate.now()));
+        }
     }
 
     private CharacterLocation getLocationStats(final User user) {
