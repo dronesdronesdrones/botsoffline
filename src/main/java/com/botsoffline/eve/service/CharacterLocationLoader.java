@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,14 +58,16 @@ public class CharacterLocationLoader {
     public void update() {
         log.debug("Updating playerStats.");
         final Instant before = Instant.now();
-        final List<Long> solarSystemIds = solarSystemRepository.findAll().stream()
-                .map(SolarSystem::getSystemId)
-                .collect(Collectors.toList());
+        final List<SolarSystem> solarSystems = solarSystemRepository.findAll();
         final List<Activity> activities = activityRepository.findAllByDate(LocalDate.now());
-        final List<CharacterLocation> result = userRepository.findAllByTrackingStatus(TrackingStatus.ENABLED)
+        final List<User> allUsers = userRepository.findAllByTrackingStatus(TrackingStatus.ENABLED);
+        final Map<Long, Long> userSov = new HashMap<>();
+        allUsers.forEach(user -> userSov.put(user.getCharacterId(), user.getAllianceId()));
+        final List<CharacterLocation> result = allUsers
                 .stream().map(this::getLocationStats)
                 .filter(Objects::nonNull)
-                .filter(stat -> solarSystemIds.contains(stat.getSystemId()))
+                .filter(location -> isInSystemList(location.getSystemId(), solarSystems))
+                .peek(location -> markIfInOwnSov(location, userSov, solarSystems))
                 .peek(location -> extendActivities(location, activities))
                 .collect(Collectors.toList());
         locationRepository.save(result);
@@ -73,6 +77,36 @@ public class CharacterLocationLoader {
         log.info("Updated {} playerStats.", result.size());
 
         // todo: score modifier
+    }
+
+    private void markIfInOwnSov(final CharacterLocation location, final Map<Long, Long> userSov,
+            final List<SolarSystem> solarSystems) {
+        final Long sovHolder = getSovHolder(location, solarSystems);
+        final Long characterAlliance = userSov.get(location.getCharacterId());
+        if (null == sovHolder || null == characterAlliance) {
+            location.setInOwnSov(false);
+        } else {
+            location.setInOwnSov(!sovHolder.equals(characterAlliance));
+        }
+    }
+
+    private Long getSovHolder(final CharacterLocation location, final List<SolarSystem> solarSystems) {
+        Long sovHolder = null;
+        for (final SolarSystem solarSystem : solarSystems) {
+            if (solarSystem.getSystemId().equals(location.getSystemId())) {
+                sovHolder = solarSystem.getSovHoldingAlliance();
+            }
+        }
+        return sovHolder;
+    }
+
+    private boolean isInSystemList(final Long systemId, final Iterable<SolarSystem> solarSystems) {
+        for (final SolarSystem solarSystem : solarSystems) {
+            if (solarSystem.getSystemId().equals(systemId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void extendActivities(final CharacterLocation location, final Collection<Activity> activities) {

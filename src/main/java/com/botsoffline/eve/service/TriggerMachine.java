@@ -33,7 +33,7 @@ public class TriggerMachine {
     }
 
     @Async
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 45 * * * *")
     public void updateSov() {
         systemStatsLoader.update();
     }

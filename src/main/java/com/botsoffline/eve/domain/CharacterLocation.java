@@ -12,6 +12,7 @@ public class CharacterLocation {
     private Long systemId;
     private Long structureId;
     private Instant instant;
+    private boolean inOwnSov;
 
     public CharacterLocation() {
     }
@@ -69,5 +70,24 @@ public class CharacterLocation {
 
     public void setInstant(final Instant instant) {
         this.instant = instant;
+    }
+
+    @Override
+    public String toString() {
+        return "CharacterLocation{" +
+               "id='" + id + '\'' +
+               ", characterId=" + characterId +
+               ", systemId=" + systemId +
+               ", structureId=" + structureId +
+               ", instant=" + instant +
+               '}';
+    }
+
+    public void setInOwnSov(final boolean inOwnSov) {
+        this.inOwnSov = inOwnSov;
+    }
+
+    public boolean isInOwnSov() {
+        return inOwnSov;
     }
 }
