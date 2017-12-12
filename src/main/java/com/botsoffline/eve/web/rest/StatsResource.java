@@ -4,12 +4,14 @@ import java.time.Instant;
 import java.util.Optional;
 
 import com.botsoffline.eve.domain.CharacterLocation;
+import com.botsoffline.eve.domain.NoPendingSystemStatusFoundException;
 import com.botsoffline.eve.domain.User;
 import com.botsoffline.eve.repository.CharacterLocationRepository;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.UserRepository;
 import com.botsoffline.eve.security.SecurityUtils;
 import com.botsoffline.eve.service.CharacterLocationLoader;
+import com.botsoffline.eve.service.CharacterSystemStatusService;
 import com.codahale.metrics.annotation.Timed;
 
 import org.slf4j.Logger;
@@ -29,15 +31,18 @@ public class StatsResource {
     private final UserRepository userRepository;
     private final CharacterLocationLoader locationLoader;
     private final SolarSystemRepository systemRepository;
+    private final CharacterSystemStatusService characterSystemStatusService;
 
     public StatsResource(final CharacterLocationRepository locationRepository,
             final UserRepository userRepository,
             final CharacterLocationLoader locationLoader,
-            final SolarSystemRepository systemRepository) {
+            final SolarSystemRepository systemRepository,
+            final CharacterSystemStatusService characterSystemStatusService) {
         this.locationRepository = locationRepository;
         this.userRepository = userRepository;
         this.locationLoader = locationLoader;
         this.systemRepository = systemRepository;
+        this.characterSystemStatusService = characterSystemStatusService;
     }
 
     @GetMapping("/player/current-status")
@@ -65,6 +70,24 @@ public class StatsResource {
         if (oneByLogin.isPresent()) {
             final long count = locationRepository.countByCharacterId(oneByLogin.get().getCharacterId());
             return ResponseEntity.ok(count);
+        } else {
+            log.warn("Could not find the user for {}.", SecurityUtils.getCurrentUserLogin());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/player/rank-in-system")
+    @Timed
+    public ResponseEntity<Integer> getRankInSystem() {
+        final Optional<User> oneByLogin = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+        if (oneByLogin.isPresent()) {
+            try {
+                final int rank = characterSystemStatusService.getRankInSystem(oneByLogin.get().getCharacterId());
+                return ResponseEntity.ok(rank);
+            } catch (final NoPendingSystemStatusFoundException e) {
+                log.debug("No pending system status was found.");
+                return ResponseEntity.noContent().build();
+            }
         } else {
             log.warn("Could not find the user for {}.", SecurityUtils.getCurrentUserLogin());
             return ResponseEntity.notFound().build();

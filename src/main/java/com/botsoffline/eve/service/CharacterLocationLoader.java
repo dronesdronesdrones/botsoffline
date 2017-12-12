@@ -36,17 +36,20 @@ public class CharacterLocationLoader {
     private final UserRepository userRepository;
     private final ActivityRepository activityRepository;
     private final SolarSystemRepository solarSystemRepository;
+    private final CharacterSystemStatusService characterSystemStatusService;
     private long minutesForUpdate;
 
     public CharacterLocationLoader(final CharacterLocationRepository locationRepository,
             final JsonRequestService requestService, final UserRepository userRepository,
             final ActivityRepository activityRepository,
-            final SolarSystemRepository solarSystemRepository) {
+            final SolarSystemRepository solarSystemRepository,
+            final CharacterSystemStatusService characterSystemStatusService) {
         this.locationRepository = locationRepository;
         this.requestService = requestService;
         this.userRepository = userRepository;
         this.activityRepository = activityRepository;
         this.solarSystemRepository = solarSystemRepository;
+        this.characterSystemStatusService = characterSystemStatusService;
     }
 
     @Timed
@@ -68,6 +71,8 @@ public class CharacterLocationLoader {
         final Instant after = Instant.now();
         minutesForUpdate = before.until(after, ChronoUnit.MINUTES);
         log.info("Updated {} playerStats.", result.size());
+
+        // todo: score modifier
     }
 
     private void extendActivities(final CharacterLocation location, final Collection<Activity> activities) {
@@ -75,22 +80,31 @@ public class CharacterLocationLoader {
                 .filter(a -> a.getCharacterId() == location.getCharacterId()
                        && a.getSystemId() == location.getSystemId())
                 .findFirst();
-        // todo: score modifier
         if (optional.isPresent()) {
             optional.get().addOneMinute();
         } else {
-            activities.add(new Activity(location.getCharacterId(), location.getSystemId(), 1,
-                                        null, LocalDate.now()));
+            activities.add(new Activity(location.getCharacterId(), location.getSystemId(), 1, LocalDate.now()));
         }
     }
 
     private CharacterLocation getLocationStats(final User user) {
         final String accessToken = getAccessToken(user);
         if (null != accessToken) {
-            return requestService.getLocationIfOnline(user.getCharacterId(), accessToken);
+            return getLocationIfOnline(user.getCharacterId(), accessToken);
         } else {
+            characterSystemStatusService.complete(user.getCharacterId());
             return null;
         }
+    }
+
+    private CharacterLocation getLocationIfOnline(final long characterId, final String accessToken) {
+        if (!requestService.isOnline(characterId, accessToken)) {
+            characterSystemStatusService.complete(characterId);
+            return null;
+        }
+        final CharacterLocation location = requestService.getLocation(characterId, accessToken);
+        characterSystemStatusService.createOrUpdate(characterId, location.getSystemId());
+        return location;
     }
 
     private String getAccessToken(final User user) {

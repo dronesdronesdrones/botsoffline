@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
     system: string;
     totalMinutes: number;
     ssoUrl: string;
+    rankInSystem: number;
 
     constructor(
         private principal: Principal,
@@ -63,6 +64,13 @@ export class HomeComponent implements OnInit {
         this.http.get("/api/player/total-minutes").subscribe(
                 (data) => {
                     this.totalMinutes = +data.text();
+                }
+        );
+        this.http.get("/api/player/rank-in-system").subscribe(
+                (data) => {
+                    if (data.status === 200) {
+                        this.rankInSystem = +data.text();
+                    }
                 }
         );
     }

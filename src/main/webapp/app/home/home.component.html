@@ -30,5 +30,6 @@
     </p>
     <div class="alert alert-warning" *ngIf="account.trackingStatus === 'DISABLED'">Please visit Account > Tracking to enable tracking.</div>
     <div class="alert alert-warning" *ngIf="account.trackingStatus === 'ENABLED' && status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking.</div>
-    <p *ngIf="totalMinutes">You have been preventing the botting menace for a total of <b>{{totalMinutes}}</b> minutes.</p>
+    <p *ngIf="rankInSystem">You are the {{rankInSystem}}. in system. <b *ngIf="rankInSystem > 4">Please choose another system!</b></p>
+    <p *ngIf="totalMinutes">You have been preventing the botting menace for <span *ngIf="totalMinutes < 60">{{totalMinutes}} minutes</span><span *ngIf="totalMinutes >= 60">a total of <b>{{totalMinutes / 60 | number:'1.0-1'}}</b> hours</span>.</p>
 </div>

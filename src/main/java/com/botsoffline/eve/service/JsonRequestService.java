@@ -171,14 +171,7 @@ public class JsonRequestService {
         return result;
     }
 
-    public CharacterLocation getLocationIfOnline(final long characterId, final String accessToken) {
-        if (!isOnline(characterId, accessToken)) {
-            return null;
-        }
-        return getLocation(characterId, accessToken);
-    }
-
-    private CharacterLocation getLocation(final long characterId, final String accessToken) {
+    public CharacterLocation getLocation(final long characterId, final String accessToken) {
         final String url = String.format("%s/v1/characters/%d/location/?token=%s", ESI_BASE_URL, characterId, accessToken);
         final Optional<JsonNode> jsonNode = justGet(url);
         if (jsonNode.isPresent()) {
@@ -192,7 +185,7 @@ public class JsonRequestService {
         }
     }
 
-    private boolean isOnline(final long characterId, final String accessToken) {
+    public boolean isOnline(final long characterId, final String accessToken) {
         final String url = String.format("%s/v1/characters/%d/online/?token=%s", ESI_BASE_URL, characterId, accessToken);
         final GetRequest onlineRequest = get(url, null);
         final HttpResponse<String> onlineResponse;

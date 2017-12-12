@@ -10,28 +10,23 @@ public class Activity {
     private long characterId;
     private long systemId;
     private int minutes;
-    private Double scoreModifier;
     private LocalDate date;
 
     public Activity() {
     }
 
-    public Activity(final long characterId, final long systemId, final int minutes, final Double scoreModifier,
-            final LocalDate date) {
+    public Activity(final long characterId, final long systemId, final int minutes, final LocalDate date) {
         this.characterId = characterId;
         this.systemId = systemId;
         this.minutes = minutes;
-        this.scoreModifier = scoreModifier;
         this.date = date;
     }
 
-    public Activity(final String id, final long characterId, final long systemId, final int minutes, final Double scoreModifier,
-            final LocalDate date) {
+    public Activity(final String id, final long characterId, final long systemId, final int minutes, final LocalDate date) {
         this.id = id;
         this.characterId = characterId;
         this.systemId = systemId;
         this.minutes = minutes;
-        this.scoreModifier = scoreModifier;
         this.date = date;
     }
 
@@ -65,14 +60,6 @@ public class Activity {
 
     public void setMinutes(final int minutes) {
         this.minutes = minutes;
-    }
-
-    public Double getScoreModifier() {
-        return scoreModifier;
-    }
-
-    public void setScoreModifier(final Double scoreModifier) {
-        this.scoreModifier = scoreModifier;
     }
 
     public LocalDate getDate() {
