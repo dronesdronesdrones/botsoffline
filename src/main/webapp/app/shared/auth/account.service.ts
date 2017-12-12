@@ -17,4 +17,8 @@ export class AccountService  {
     delete() {
         return this.http.delete('api/account');
     }
+
+    hideFromLeaderboard(hide: boolean) {
+        return this.http.put('api/account/leaderboard/' + hide, null);
+    }
 }

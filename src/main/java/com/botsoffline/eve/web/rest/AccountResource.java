@@ -78,6 +78,14 @@ public class AccountResource {
         userService.persistUser(user);
     }
 
+    @PutMapping("/account/leaderboard/{hide}")
+    @Timed
+    public void updateLeaderboard(@PathVariable final Boolean hide) {
+        final User user = userService.getUserWithAuthorities();
+        user.setHideFromLeaderboard(hide);
+        userService.persistUser(user);
+    }
+
     @DeleteMapping("/account")
     @Timed
     public void deleteAccount() {

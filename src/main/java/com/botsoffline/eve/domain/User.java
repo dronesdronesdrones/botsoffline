@@ -54,6 +54,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Instant accessTokenExpiry;
     private String accessToken;
     private TrackingStatus trackingStatus;
+    private Boolean hideFromLeaderboard;
 
     public String getId() {
         return id;
@@ -159,5 +160,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public TrackingStatus getTrackingStatus() {
         return trackingStatus;
+    }
+
+    public Boolean getHideFromLeaderboard() {
+        return hideFromLeaderboard;
+    }
+
+    public void setHideFromLeaderboard(final Boolean hideFromLeaderboard) {
+        this.hideFromLeaderboard = hideFromLeaderboard;
     }
 }

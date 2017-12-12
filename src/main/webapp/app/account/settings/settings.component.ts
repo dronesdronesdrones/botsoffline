@@ -20,6 +20,9 @@ export class SettingsComponent implements OnInit {
     changeTrackingSuccess: boolean;
     changeTrackingSubmitted: boolean;
 
+    changeLeaderboardSuccess: boolean;
+    changeLeaderboardSubmitted: boolean;
+
     accountDeleteFailed: boolean;
     characterNameConfirm: string;
 
@@ -60,6 +63,17 @@ export class SettingsComponent implements OnInit {
         }, (err) => {
             this.changeTrackingSuccess = false
             this.changeTrackingSubmitted = true;
+        });
+    }
+
+    hide(hide: boolean): void {
+        this.accountService.hideFromLeaderboard(hide).subscribe((data) => {
+            this.changeLeaderboardSuccess = true
+            this.changeLeaderboardSubmitted = true;
+            this.account.hideFromLeaderboard = hide;
+        }, (err) => {
+            this.changeLeaderboardSuccess = false
+            this.changeLeaderboardSubmitted = true;
         });
     }
 }

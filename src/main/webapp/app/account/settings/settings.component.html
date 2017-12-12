@@ -20,6 +20,25 @@
     <hr/>
     <div class="row justify-content-center">
         <div class="col-md-8">
+            <h2>Hide From Leaderboard</h2>
+            <p>Use this option if you don't want your character to appear on the leaderboards. Scores are still collected in case you change your mind.</p>
+            <p *ngIf="account">Leaderboard is currently <b style="color: green" *ngIf="!account.hideFromLeaderboard">enabled</b><b style="color: red" *ngIf="account.hideFromLeaderboard">disabled</b>.</p>
+
+            <div class="alert alert-success" *ngIf="changeLeaderboardSubmitted && changeLeaderboardSuccess">
+                <strong>Settings saved!</strong>
+            </div>
+
+            <div class="alert alert-danger" *ngIf="changeLeaderboardSubmitted && !changeLeaderboardSuccess">
+                <strong>Update failed. Please submit a ticket if the issue persists.</strong>
+            </div>
+
+            <button *ngIf="!account.hideFromLeaderboard" type="button" class="btn btn-danger" (click)="hide(true)">Disable</button>
+            <button *ngIf="account.hideFromLeaderboard" type="button" class="btn btn-success" (click)="hide(false)">Enable</button>
+        </div>
+    </div>
+    <hr/>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
             <h2>Delete Account</h2>
             <p>Deleting your account will remove all details we have about you, including SSO tokens and your score. Location data will be anonymised.</p>
             <p><b>This action cannot be undone!</b></p>
