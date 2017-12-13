@@ -4,7 +4,7 @@
             <i class="fa fa-bars"></i>
         </a>
         <a class="navbar-brand logo float-left" routerLink="/" (click)="collapseNavbar()">
-            <span>BotsOffline</span>
+            <span>BotsOffline</span><span *ngIf="userName" style="color: #aaa">&nbsp; {{userName}}</span>
         </a>
     </div>
     <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
