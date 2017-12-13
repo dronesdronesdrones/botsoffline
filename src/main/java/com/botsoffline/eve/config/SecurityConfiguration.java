@@ -7,11 +7,11 @@
 
 package com.botsoffline.eve.config;
 
+import javax.annotation.PostConstruct;
+
 import com.botsoffline.eve.security.AuthoritiesConstants;
 import com.botsoffline.eve.security.jwt.JWTConfigurer;
 import com.botsoffline.eve.security.jwt.TokenProvider;
-
-import io.github.jhipster.security.*;
 
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +31,7 @@ import org.springframework.security.data.repository.query.SecurityEvaluationCont
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.annotation.PostConstruct;
+import io.github.jhipster.security.Http401UnauthorizedEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -104,8 +104,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
             .authorizeRequests()
-            .antMatchers("/api/contracts/caps").permitAll()
-            .antMatchers("/api/appraisal/**").permitAll()
+            .antMatchers("/api/candidates").permitAll()
             .antMatchers("/api/config/**").permitAll()
             .antMatchers("/api/authenticate/").permitAll()
             .antMatchers("/api/authenticate/sso").permitAll()
@@ -118,7 +117,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN)
         .and()
             .apply(securityConfigurerAdapter());
-
     }
 
     private JWTConfigurer securityConfigurerAdapter() {

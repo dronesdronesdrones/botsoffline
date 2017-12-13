@@ -7,3 +7,4 @@ application-prod.yml
 yarn.lock
 *.pem
 secrets.tar
+copyDB.sh

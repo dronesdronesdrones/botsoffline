@@ -2,23 +2,29 @@ package com.botsoffline.eve.service;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import io.github.jhipster.config.JHipsterConstants;
+
 @Component
-//@Profile(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
+@Profile(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
 public class TriggerMachine {
 
     private final SystemStatsLoader systemStatsLoader;
     private final CharacterLocationLoader playerStatsLoader;
     private final UserService userService;
+    private final BottingScoreService bottingScoreService;
 
     public TriggerMachine(final SystemStatsLoader systemStatsLoader,
-            final CharacterLocationLoader playerStatsLoader, final UserService userService) {
+            final CharacterLocationLoader playerStatsLoader, final UserService userService,
+            final BottingScoreService bottingScoreService) {
         this.systemStatsLoader = systemStatsLoader;
         this.playerStatsLoader = playerStatsLoader;
         this.userService = userService;
+        this.bottingScoreService = bottingScoreService;
     }
 
     @PostConstruct
@@ -54,6 +60,12 @@ public class TriggerMachine {
     @Scheduled(cron = "0 0 0 * * *")
     public void updateAffiliations() {
         userService.updateAffiliations();
+    }
+
+    @Async
+    @Scheduled(cron = "0 0 11 * * *")
+    public void updateBottingScores() {
+        bottingScoreService.update();
     }
 
 }
