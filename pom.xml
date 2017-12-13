@@ -11,7 +11,7 @@
 
     <groupId>com.botsoffline.eve</groupId>
     <artifactId>botsoffline</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
     <packaging>war</packaging>
     <name>BotsOffline</name>
 
