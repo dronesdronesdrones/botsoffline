@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
     totalMinutes: number;
     ssoUrl: string;
     rankInSystem: number;
+    candidates: any[];
 
     constructor(
         private principal: Principal,
@@ -36,6 +37,7 @@ export class HomeComponent implements OnInit {
         });
         this.registerAuthenticationSuccess();
         this.configService.getSsoUrl().subscribe((data) => this.ssoUrl = data);
+        this.http.get('api/candidates').subscribe((data) => this.candidates = data.json());
     }
 
     registerAuthenticationSuccess() {

@@ -3,14 +3,16 @@ package com.botsoffline.eve.domain;
 public class BottingScoreEntry {
     private long systemId;
     private String systemName;
+    private String regionName;
     private int score;
 
     public BottingScoreEntry() {
     }
 
-    public BottingScoreEntry(final long systemId, final String systemName, final int score) {
+    public BottingScoreEntry(final long systemId, final String systemName, final String regionName, final int score) {
         this.systemId = systemId;
         this.systemName = systemName;
+        this.regionName = regionName;
         this.score = score;
     }
 
@@ -36,5 +38,13 @@ public class BottingScoreEntry {
 
     public void setScore(final int score) {
         this.score = score;
+    }
+
+    public String getRegionName() {
+        return regionName;
+    }
+
+    public void setRegionName(final String regionName) {
+        this.regionName = regionName;
     }
 }

@@ -245,4 +245,18 @@ public class JsonRequestService {
         }
         return result;
     }
+
+    Optional<JsonNode> getConstellation(final long constellationId) {
+        final String url = String.format("%s/v1/universe/constellations/%d", ESI_BASE_URL, constellationId);
+        return justGet(url);
+    }
+
+    String getRegionName(final long regionId) {
+        final String url = String.format("%s/v1/universe/regions/%d", ESI_BASE_URL, regionId);
+        return justGet(url).map(this::extractRegionName).orElse(null);
+    }
+
+    private String extractRegionName(final JsonNode jsonNode) {
+        return jsonNode.getObject().getString("name");
+    }
 }
