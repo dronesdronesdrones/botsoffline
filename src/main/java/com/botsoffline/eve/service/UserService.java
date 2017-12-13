@@ -137,8 +137,10 @@ public class UserService {
                 .peek(this::setCorporationAndAlliance)
                 .filter(user -> user.getCorporationId() != null)
                 .collect(Collectors.toList());
-        userRepository.save(collect);
-        log.info("Initiated affiliations for {} characters.", collect.size());
+        if (!collect.isEmpty()) {
+            userRepository.save(collect);
+            log.info("Initiated affiliations for {} characters.", collect.size());
+        }
     }
 
     public void updateAffiliations() {
