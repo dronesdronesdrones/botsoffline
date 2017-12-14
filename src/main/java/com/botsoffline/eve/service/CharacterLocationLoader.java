@@ -12,12 +12,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.botsoffline.eve.domain.Activity;
+import com.botsoffline.eve.domain.BottingScoreEntry;
 import com.botsoffline.eve.domain.CharacterLocation;
+import com.botsoffline.eve.domain.CharacterScore;
+import com.botsoffline.eve.domain.NoPendingSystemStatusFoundException;
 import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.User;
 import com.botsoffline.eve.domain.enums.TrackingStatus;
 import com.botsoffline.eve.repository.ActivityRepository;
 import com.botsoffline.eve.repository.CharacterLocationRepository;
+import com.botsoffline.eve.repository.CharacterScoreRepository;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.UserRepository;
 import com.codahale.metrics.annotation.Timed;
@@ -39,19 +43,25 @@ public class CharacterLocationLoader {
     private final ActivityRepository activityRepository;
     private final SolarSystemRepository solarSystemRepository;
     private final CharacterSystemStatusService characterSystemStatusService;
+    private final BottingScoreService bottingScoreService;
+    private final CharacterScoreRepository characterScoreRepository;
     private long minutesForUpdate;
 
     public CharacterLocationLoader(final CharacterLocationRepository locationRepository,
             final JsonRequestService requestService, final UserRepository userRepository,
             final ActivityRepository activityRepository,
             final SolarSystemRepository solarSystemRepository,
-            final CharacterSystemStatusService characterSystemStatusService) {
+            final CharacterSystemStatusService characterSystemStatusService,
+            final BottingScoreService bottingScoreService,
+            final CharacterScoreRepository characterScoreRepository) {
         this.locationRepository = locationRepository;
         this.requestService = requestService;
         this.userRepository = userRepository;
         this.activityRepository = activityRepository;
         this.solarSystemRepository = solarSystemRepository;
         this.characterSystemStatusService = characterSystemStatusService;
+        this.bottingScoreService = bottingScoreService;
+        this.characterScoreRepository = characterScoreRepository;
     }
 
     @Timed
@@ -74,9 +84,38 @@ public class CharacterLocationLoader {
         activityRepository.save(activities);
         final Instant after = Instant.now();
         minutesForUpdate = before.until(after, ChronoUnit.MINUTES);
-        log.info("Updated {} playerStats.", result.size());
 
-        // todo: score modifier
+        // calculate scores
+        final List<BottingScoreEntry> latestScores = bottingScoreService.getLatest();
+        final List<CharacterScore> scores = result.stream()
+                .map(characterLocation -> toScoreEntry(characterLocation, latestScores))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        characterScoreRepository.save(scores);
+
+        log.info("Updated {} playerStats.", result.size());
+    }
+
+    private CharacterScore toScoreEntry(final CharacterLocation characterLocation, final Collection<BottingScoreEntry> systemStatuses) {
+        return systemStatuses.stream()
+                .filter(stat -> stat.getSystemId() == characterLocation.getSystemId())
+                .findFirst()
+                .map(bottingScoreEntry -> new CharacterScore(characterLocation.getCharacterId(),
+                                                             characterLocation.getSystemId(),
+                                                             getScoreForPlayer(characterLocation.getCharacterId(),
+                                                                               bottingScoreEntry.getScore())))
+                .orElse(null);
+    }
+
+    private int getScoreForPlayer(final long characterId, final int score) {
+        try {
+            final int rank = characterSystemStatusService.getRankInSystem(characterId);
+            // subtract 30% from the score for each rank behind the first rank
+            return (int) (score * (1.0 - (0.3 * (rank - 1))));
+        } catch (final NoPendingSystemStatusFoundException e) {
+            log.info("No pending system could be found for character {} while adding scores.", characterId);
+            return 0;
+        }
     }
 
     private void markIfInOwnSov(final CharacterLocation location, final Map<Long, Long> userSov,

@@ -80,4 +80,8 @@ public class BottingScoreService {
         final int count = (int) activeCharacters.stream().filter(a -> a.getSystemId() == entry.getSystemId()).count();
         return new BottingScoreDTO(entry.getSystemName(), entry.getRegionName(), entry.getScore(), count);
     }
+
+    List<BottingScoreEntry> getLatest() {
+        return scoreRepository.findTop1ByOrderByDateDesc().getList();
+    }
 }

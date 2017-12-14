@@ -2,6 +2,7 @@ package com.botsoffline.eve.service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 import com.botsoffline.eve.domain.CharacterSystemStatus;
@@ -73,5 +74,9 @@ public class CharacterSystemStatusService {
         } else {
             return rank[0];
         }
+    }
+
+    List<CharacterSystemStatus> getPending() {
+        return repository.findAllByEndIsNull();
     }
 }
