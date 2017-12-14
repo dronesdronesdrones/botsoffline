@@ -27,11 +27,11 @@ public class HighscoreResource {
         this.service = service;
     }
 
-    @GetMapping("/highscore/{days}")
-    public ResponseEntity<List<HighscoreEntry>> getHighscore(@PathVariable int days) {
+    @GetMapping("/highscore/days/{days}/length/{length}")
+    public ResponseEntity<List<HighscoreEntry>> getHighscore(@PathVariable final int days, @PathVariable final int length) {
         if (days != 7 && days != 30) {
             log.info("Retrieving highscore for {} days by {}.", days, SecurityUtils.getCurrentUserLogin());
         }
-        return ResponseEntity.ok(service.getHighscore(days));
+        return ResponseEntity.ok(service.getHighscore(days, length));
     }
 }
