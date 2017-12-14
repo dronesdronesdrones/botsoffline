@@ -56,7 +56,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Instant accessTokenExpiry;
     private String accessToken;
     private TrackingStatus trackingStatus;
-    private Boolean hideFromLeaderboard;
+    private boolean hideFromLeaderboard;
 
     public Long getCorporationId() {
         return corporationId;

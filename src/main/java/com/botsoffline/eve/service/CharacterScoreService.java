@@ -37,7 +37,7 @@ public class CharacterScoreService {
 
     @Timed
     public List<HighscoreEntry> getHighscore(final int days, final int length) {
-        final List<User> nonHideUsers = userRepository.findAllByHideFromLeaderboard(false);
+        final List<User> leaderboardUsers = userRepository.findAllByHideFromLeaderboard(false);
         final List<Long> hideCharacterIds = userRepository.findAllByHideFromLeaderboard(true).stream()
                 .map(User::getCharacterId).collect(Collectors.toList());
         final List<CharacterScore> scoresSinceDay = scoreRepository.findAllByInstantAfterAndCharacterIdNotIn(
@@ -50,11 +50,12 @@ public class CharacterScoreService {
             }
             scoreMap.put(characterId, scoreMap.get(characterId) + score.getScore());
         });
-        return scoreMap.entrySet().stream().map(entry -> toHighScoreEntry(entry, nonHideUsers))
+        List<HighscoreEntry> highscores = scoreMap.entrySet().stream().map(
+                entry -> toHighScoreEntry(entry, leaderboardUsers))
                 .filter(Objects::nonNull)
                 .sorted(this::compareHighscore)
-                .collect(Collectors.toList())
-                .subList(0, length);
+                .collect(Collectors.toList());
+        return highscores.size() > length ? highscores.subList(0, length) : highscores;
     }
 
     private int compareHighscore(final HighscoreEntry e1, final HighscoreEntry e2) {

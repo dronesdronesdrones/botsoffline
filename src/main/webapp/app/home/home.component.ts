@@ -19,6 +19,8 @@ export class HomeComponent implements OnInit {
     ssoUrl: string;
     rankInSystem: number;
     candidates: any[];
+    highscore: any[];
+    myScore: number;
 
     constructor(
         private principal: Principal,
@@ -33,11 +35,13 @@ export class HomeComponent implements OnInit {
             this.account = account;
             if (account) {
                 this.loadStats();
+                this.http.get('api/score/days/7').subscribe((data) => this.myScore = +data.text());
             }
         });
         this.registerAuthenticationSuccess();
         this.configService.getSsoUrl().subscribe((data) => this.ssoUrl = data);
         this.http.get('api/candidates').subscribe((data) => this.candidates = data.json());
+        this.http.get('api/highscore/days/7/length/10').subscribe((data) => this.highscore = data.json());
     }
 
     registerAuthenticationSuccess() {
