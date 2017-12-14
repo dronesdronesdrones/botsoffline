@@ -19,7 +19,9 @@ import com.codahale.metrics.annotation.Timed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CharacterScoreService {
 
     private final Logger log = LoggerFactory.getLogger(CharacterScoreService.class);
