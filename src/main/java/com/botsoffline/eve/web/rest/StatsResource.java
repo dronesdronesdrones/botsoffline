@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.botsoffline.eve.domain.CharacterLocation;
 import com.botsoffline.eve.domain.NoPendingSystemStatusFoundException;
+import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.User;
 import com.botsoffline.eve.repository.CharacterLocationRepository;
 import com.botsoffline.eve.repository.SolarSystemRepository;
@@ -17,6 +18,7 @@ import com.codahale.metrics.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,7 +55,12 @@ public class StatsResource {
             final CharacterLocation lastLocation = locationRepository.findTop1ByCharacterIdOrderByInstantDesc(
                     oneByLogin.get().getCharacterId());
             if (lastLocation != null && Instant.now().minusSeconds(locationLoader.getLoginDelay() * 60).isBefore(lastLocation.getInstant())) {
-                return ResponseEntity.ok(systemRepository.findBySystemId(lastLocation.getSystemId()));
+                final SolarSystem system = systemRepository.findBySystemId(lastLocation.getSystemId());
+                final BodyBuilder builder = ResponseEntity.ok();
+                if (lastLocation.isInOwnSov()) {
+                    builder.header("X-OWN-SOV", "true");
+                }
+                return builder.body(system);
             } else {
                 return ResponseEntity.noContent().build();
             }

@@ -31,12 +31,12 @@
             <h2>Your Status</h2>
             <p>
                 Tracking:
-                <span *ngIf="account.trackingStatus === 'ENABLED'" [ngClass]="status">{{status}}</span>
+                <span *ngIf="account.trackingStatus === 'ENABLED'" [ngClass]="status">{{status}}</span> <span *ngIf="isOwnSov">(you're in friendly space)</span>
                 <span *ngIf="account.trackingStatus === 'DISABLED'" class="inactive">disabled</span>
                 <span *ngIf="account.trackingStatus === 'ENABLED' && status === 'active'">({{system}})</span>
             </p>
             <div class="alert alert-warning" *ngIf="account.trackingStatus === 'DISABLED'">Please visit Account > Tracking to enable tracking.</div>
-            <div class="alert alert-warning" *ngIf="account.trackingStatus === 'ENABLED' && status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking.</div>
+            <div class="alert alert-warning" *ngIf="account.trackingStatus === 'ENABLED' && status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking. Friendly space doesn't count.</div>
             <p *ngIf="rankInSystem">You are the {{rankInSystem}}. in system. <b *ngIf="rankInSystem > 4">Please choose another system!</b></p>
             <p *ngIf="totalMinutes">You have been preventing the botting menace for <span *ngIf="totalMinutes < 60">{{totalMinutes}} minutes</span><span *ngIf="totalMinutes >= 60">a total of <b>{{totalMinutes / 60 | number:'1.0-1'}}</b> hours</span>.</p>
         </div>
@@ -64,17 +64,17 @@
 </div>
 <div *ngIf="candidates">
     <h2>Possible Systems With Bots</h2>
-    <p>This list does not try to prove systems with bots, but provides candidates for you to camp and provide further information. The score
+    <p>This list does not try to prove systems with bots, but provides candidates for you to camp and provide further information. The rating
     is produced by running the NPC kills through <a href="https://github.com/dronesdronesdrones/botsoffline/blob/ba1138cfb18c8123c7560aa4d012056417e67578/src/main/java/com/botsoffline/eve/service/BottingScoreService.java#L58-L63">a score algorithm</a>. The higher the score, the higher the probability of bots. This list will
        contain false positives.</p>
-    <p>Do you have ideas on how to improve the score algorithm? Let me know by creating an <a href="https://github.com/dronesdronesdrones/botsoffline/issues">issue</a>.</p>
+    <p>Do you have ideas on how to improve the rating algorithm? Let us know by creating an <a href="https://github.com/dronesdronesdrones/botsoffline/issues">issue</a>.</p>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
             <tr>
                 <th class="text-left">System</th>
                 <th class="text-left">Region</th>
-                <th class="text-left">Score</th>
+                <th class="text-left">Rating</th>
                 <th class="text-left">Active Characters</th>
             </tr>
             </thead>

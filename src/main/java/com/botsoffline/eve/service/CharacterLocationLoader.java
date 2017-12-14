@@ -88,12 +88,24 @@ public class CharacterLocationLoader {
         // calculate scores
         final List<BottingScoreEntry> latestScores = bottingScoreService.getLatest();
         final List<CharacterScore> scores = result.stream()
+                .filter(location -> !location.isInOwnSov())
                 .map(characterLocation -> toScoreEntry(characterLocation, latestScores))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         characterScoreRepository.save(scores);
 
         log.info("Updated {} playerStats.", result.size());
+    }
+
+    private void markIfInOwnSov(final CharacterLocation location, final Map<Long, Long> userSov,
+            final List<SolarSystem> solarSystems) {
+        final Long sovHolder = getSovHolder(location, solarSystems);
+        final Long characterAlliance = userSov.get(location.getCharacterId());
+        if (null == sovHolder || null == characterAlliance) {
+            location.setInOwnSov(false);
+        } else {
+            location.setInOwnSov(sovHolder.equals(characterAlliance));
+        }
     }
 
     private CharacterScore toScoreEntry(final CharacterLocation characterLocation, final Collection<BottingScoreEntry> systemStatuses) {
@@ -116,17 +128,6 @@ public class CharacterLocationLoader {
         } catch (final NoPendingSystemStatusFoundException e) {
             log.info("No pending system could be found for character {} while adding scores.", characterId);
             return 0;
-        }
-    }
-
-    private void markIfInOwnSov(final CharacterLocation location, final Map<Long, Long> userSov,
-            final List<SolarSystem> solarSystems) {
-        final Long sovHolder = getSovHolder(location, solarSystems);
-        final Long characterAlliance = userSov.get(location.getCharacterId());
-        if (null == sovHolder || null == characterAlliance) {
-            location.setInOwnSov(false);
-        } else {
-            location.setInOwnSov(!sovHolder.equals(characterAlliance));
         }
     }
 

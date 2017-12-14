@@ -1,5 +1,6 @@
 package com.botsoffline.eve.service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import com.botsoffline.eve.domain.SolarSystemStats;
 import com.botsoffline.eve.domain.SovInfo;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.SolarSystemStatsRepository;
+import com.codahale.metrics.annotation.Timed;
 import com.mashape.unirest.http.JsonNode;
 
 import org.json.JSONObject;
@@ -48,10 +50,14 @@ public class SystemStatsLoader {
                     .filter(system -> system.getSecurityStatus() <= 0)
                     .filter(system -> system.getName().length() < 7)
                     .peek(system -> updateRegion(system, constellations))
+                    .filter(system -> !Arrays.asList("UUA-F4", "A821-A", "J7HZ-F").contains(system.getRegionName()))
                     .collect(Collectors.toList());
             solarSystemRepository.save(systems);
-            log.info("Added nullsec systems. Continuing with stats.");
+            log.info("Added nullsec systems. Continuing with sov.");
+            updateSov();
+            log.info("Update sov. Continuing with stats.");
             update();
+            log.info("Finished system init.");
         } else {
             log.warn("Skipped solar system initialization as there are more than 0 systems present.");
         }
@@ -95,7 +101,8 @@ public class SystemStatsLoader {
         log.info("Updated solarSystemStats.");
     }
 
-    void updateSov() {
+    @Timed
+    public void updateSov() {
         final List<SovInfo> sovInfos = requestService.getSovInformation();
         final List<SolarSystem> systems = solarSystemRepository.findAll().stream()
                 .map(e -> {
@@ -117,7 +124,7 @@ public class SystemStatsLoader {
     private boolean setSovInfoIfAvailable(final SolarSystem system, final Iterable<SovInfo> sovInfos) {
         for (final SovInfo sovInfo : sovInfos) {
             if (system.getSystemId() == sovInfo.getSystemId()) {
-                if (system.getSovHoldingAlliance() != null && system.getSovHoldingAlliance() != sovInfo.getAllianceId()) {
+                if (system.getSovHoldingAlliance() == null) {
                     system.setSovHoldingAlliance(sovInfo.getAllianceId());
                     return true;
                 } else {

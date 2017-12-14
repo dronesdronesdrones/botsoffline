@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
     candidates: any[];
     highscore: any[];
     myScore: number;
+    isOwnSov: boolean;
 
     constructor(
         private principal: Principal,
@@ -60,8 +61,13 @@ export class HomeComponent implements OnInit {
                 (data) => {
                     const status = data.status;
                     if (status === 200) {
-                        this.status = 'active';
                         this.system = data.json().name;
+                        this.isOwnSov = data.headers.get('X-OWN-SOV') === 'true';
+                        if (this.isOwnSov) {
+                            this.status = 'inactive';
+                        } else {
+                            this.status = 'active';
+                        }
                     } else if (status === 204) {
                         this.status = 'inactive';
                     }
