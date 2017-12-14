@@ -72,4 +72,11 @@ public class CharacterScoreService {
             return null;
         }
     }
+
+    public long getScore(final String login, final int days) {
+        final User user = userRepository.findByLogin(login);
+        return scoreRepository.findAllByInstantAfterAndCharacterId(
+                LocalDateTime.now().minusDays(days).toInstant(ZoneOffset.UTC), user.getCharacterId())
+                .stream().mapToLong(CharacterScore::getScore).sum();
+    }
 }

@@ -35,4 +35,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     List<User> findAllByCorporationIdIsNull();
 
     List<User> findAllByHideFromLeaderboard(boolean hide);
+
+    User findByLogin(String login);
 }

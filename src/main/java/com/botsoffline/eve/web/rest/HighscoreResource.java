@@ -3,7 +3,6 @@ package com.botsoffline.eve.web.rest;
 import java.util.List;
 
 import com.botsoffline.eve.security.SecurityUtils;
-import com.botsoffline.eve.service.CharacterLocationLoader;
 import com.botsoffline.eve.service.CharacterScoreService;
 import com.botsoffline.eve.web.dto.HighscoreEntry;
 
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api")
 public class HighscoreResource {
 
-    private final Logger log = LoggerFactory.getLogger(CharacterLocationLoader.class);
+    private final Logger log = LoggerFactory.getLogger(HighscoreResource.class);
 
     private final CharacterScoreService service;
 
@@ -33,5 +32,10 @@ public class HighscoreResource {
             log.info("Retrieving highscore for {} days by {}.", days, SecurityUtils.getCurrentUserLogin());
         }
         return ResponseEntity.ok(service.getHighscore(days, length));
+    }
+
+    @GetMapping("/score/days/{days}")
+    public ResponseEntity<Long> getScore(@PathVariable final int days) {
+        return ResponseEntity.ok(service.getScore(SecurityUtils.getCurrentUserLogin(), days));
     }
 }

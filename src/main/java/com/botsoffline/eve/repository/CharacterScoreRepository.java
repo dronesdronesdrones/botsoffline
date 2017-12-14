@@ -9,4 +9,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface CharacterScoreRepository extends MongoRepository<CharacterScore, String> {
     List<CharacterScore> findAllByInstantAfterAndCharacterIdNotIn(Instant instant, List<Long> characterIds);
+
+    List<CharacterScore> findAllByInstantAfterAndCharacterId(Instant instant, Long characterId);
 }
