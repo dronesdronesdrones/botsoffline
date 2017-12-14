@@ -1,18 +1,23 @@
 package com.botsoffline.eve.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.botsoffline.eve.domain.BottingScore;
 import com.botsoffline.eve.domain.BottingScoreEntry;
+import com.botsoffline.eve.domain.CharacterSystemStatus;
 import com.botsoffline.eve.domain.SolarSystem;
 import com.botsoffline.eve.domain.SolarSystemStats;
 import com.botsoffline.eve.repository.BottingScoreRepository;
+import com.botsoffline.eve.repository.CharacterSystemStatusRepository;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.SolarSystemStatsRepository;
+import com.botsoffline.eve.web.dto.BottingScoreDTO;
 
 import org.springframework.stereotype.Service;
 
@@ -22,13 +27,16 @@ public class BottingScoreService {
     private final SolarSystemStatsRepository statsRepository;
     private final SolarSystemRepository solarSystemRepository;
     private final BottingScoreRepository scoreRepository;
+    private final CharacterSystemStatusRepository characterSystemStatusRepository;
 
     public BottingScoreService(final SolarSystemStatsRepository statsRepository,
             final SolarSystemRepository solarSystemRepository,
-            final BottingScoreRepository scoreRepository) {
+            final BottingScoreRepository scoreRepository,
+            final CharacterSystemStatusRepository characterSystemStatusRepository) {
         this.statsRepository = statsRepository;
         this.solarSystemRepository = solarSystemRepository;
         this.scoreRepository = scoreRepository;
+        this.characterSystemStatusRepository = characterSystemStatusRepository;
     }
 
     public void update() {
@@ -62,7 +70,14 @@ public class BottingScoreService {
         return (int) (totalKills / (totalDelta / 100));
     }
 
-    public BottingScore getLatest() {
-        return scoreRepository.findTop1ByOrderByDateDesc();
+    public List<BottingScoreDTO> getLatest(final int start, final int end) {
+        List<CharacterSystemStatus> activeCharacters = characterSystemStatusRepository.findAllByEndIsNull();
+        return scoreRepository.findTop1ByOrderByDateDesc().getList().subList(0, 100).stream()
+                .map(e -> toBottingScoreDTO(e, activeCharacters)).collect(Collectors.toList());
+    }
+
+    private BottingScoreDTO toBottingScoreDTO(final BottingScoreEntry entry, final Collection<CharacterSystemStatus> activeCharacters) {
+        final int count = (int) activeCharacters.stream().filter(a -> a.getSystemId() == entry.getSystemId()).count();
+        return new BottingScoreDTO(entry.getSystemName(), entry.getRegionName(), entry.getScore(), count);
     }
 }

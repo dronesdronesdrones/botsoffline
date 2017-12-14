@@ -13,4 +13,6 @@ public interface CharacterSystemStatusRepository extends MongoRepository<Charact
     Optional<CharacterSystemStatus> findByCharacterIdAndSystemIdAndEndIsNull(long characterId, long systemId);
 
     List<CharacterSystemStatus> findAllBySystemIdAndEndIsNullOrderByStartAsc(long systemId);
+
+    List<CharacterSystemStatus> findAllByEndIsNull();
 }

@@ -1,8 +1,5 @@
 package com.botsoffline.eve.web.rest;
 
-import java.util.List;
-
-import com.botsoffline.eve.domain.BottingScoreEntry;
 import com.botsoffline.eve.service.BottingScoreService;
 import com.codahale.metrics.annotation.Timed;
 
@@ -28,7 +25,6 @@ public class BottingCandidateRepository {
     @GetMapping("/candidates")
     @Timed
     public ResponseEntity get() {
-        final List<BottingScoreEntry> list = bottingScoreService.getLatest().getList().subList(0, 100);
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(bottingScoreService.getLatest(0, 100));
     }
 }
