@@ -1,8 +1,11 @@
 package com.botsoffline.eve.domain;
 
+import java.time.Instant;
+
 public class LocalScan {
     private String user;
     private String scan;
+    private Instant instant;
 
     public LocalScan() {
     }
@@ -10,6 +13,7 @@ public class LocalScan {
     public LocalScan(final String user, final String scan) {
         this.user = user;
         this.scan = scan;
+        instant = Instant.now();
     }
 
     public String getUser() {
@@ -26,5 +30,13 @@ public class LocalScan {
 
     public void setScan(final String scan) {
         this.scan = scan;
+    }
+
+    public Instant getInstant() {
+        return instant;
+    }
+
+    public void setInstant(final Instant instant) {
+        this.instant = instant;
     }
 }
