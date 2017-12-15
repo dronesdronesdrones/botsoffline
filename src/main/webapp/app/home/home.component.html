@@ -83,7 +83,7 @@
                 <td class="text-left"><a href="http://evemaps.dotlan.net/system/{{entry.systemName}}#npc24">{{entry.systemName}}</a></td>
                 <td class="text-left">{{entry.regionName}}</td>
                 <td class="text-left">{{entry.score}}</td>
-                <td class="text-left"><span *ngIf="entry.activeCount > 0">{{entry.activeCount}}</span></td>
+                <td class="text-left"><span *ngIf="entry.activeCount > 0">{{entry.activeCount}}</span><span *ngIf="entry.activeCount == 0" style="color: #ccc">none</span></td>
             </tr>
             </tbody>
         </table>
