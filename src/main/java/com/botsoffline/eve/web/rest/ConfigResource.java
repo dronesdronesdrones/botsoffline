@@ -68,7 +68,7 @@ public class ConfigResource {
     @PutMapping(path = "/{auth}/clean-duplicate-system-scores")
     public void cleanUpSystemScores(@PathVariable final String auth) {
         if (ADMIN_SECRET.equals(auth)) {
-            bottingScoreService.cleanUpSystemScores();
+            bottingScoreService.removeDuplicates();
         } else {
             log.warn("Unauthorized update-scores call.");
         }

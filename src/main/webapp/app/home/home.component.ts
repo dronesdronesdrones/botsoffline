@@ -14,7 +14,7 @@ import {Http} from "@angular/http";
 export class HomeComponent implements OnInit {
     account: Account;
     status: string;
-    system: string;
+    system: any;
     totalMinutes: number;
     ssoUrl: string;
     rankInSystem: number;
@@ -64,9 +64,8 @@ export class HomeComponent implements OnInit {
                 (data) => {
                     const status = data.status;
                     if (status === 200) {
-                        this.system = data.json().name;
-                        this.isOwnSov = data.headers.get('X-OWN-SOV') === 'true';
-                        if (this.isOwnSov) {
+                        this.system = data.json();
+                        if (this.system.inOwnSov) {
                             this.status = 'inactive';
                         } else {
                             this.status = 'active';

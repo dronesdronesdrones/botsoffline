@@ -66,16 +66,16 @@ public class BottingScoreService {
         final List<BottingScoreEntry> bottingScores = new ArrayList<>();
         for (final Entry<Long, List<Integer>> entry : dataPerSystem.entrySet()) {
             final long systemid = entry.getKey();
-            bottingScores.add(new BottingScoreEntry(systemid, systemNames.get(systemid), systemRegionNames.get(systemid), getScore(entry)));
+            bottingScores.add(new BottingScoreEntry(systemid, systemNames.get(systemid), systemRegionNames.get(systemid), getScore(entry.getValue())));
         }
         bottingScores.sort((p1, p2) -> p2.getScore() - p1.getScore());
         scoreRepository.save(new BottingScore(bottingScores));
     }
 
-    private int getScore(final Entry<Long, List<Integer>> entry) {
-        final long totalKills = entry.getValue().stream().mapToLong(i -> i).sum();
-        final long averageKills = totalKills / entry.getValue().size();
-        final long totalDelta = entry.getValue().stream().mapToLong(i -> Math.abs(i - averageKills)).sum();
+    private int getScore(final List<Integer> npcKills) {
+        final long totalKills = npcKills.stream().mapToLong(i -> i).sum();
+        final long averageKills = totalKills / npcKills.size();
+        final long totalDelta = npcKills.stream().mapToLong(i -> Math.abs(i - averageKills)).sum();
         return (int) (totalKills / (totalDelta / 100));
     }
 
@@ -95,7 +95,7 @@ public class BottingScoreService {
     }
 
     @Async
-    public void cleanUpSystemScores() {
+    public void removeDuplicates() {
         final List<Long> systemIds = solarSystemRepository.findAll().stream().map(SolarSystem::getSystemId)
                 .collect(Collectors.toList());
         for (final long systemId : systemIds) {
@@ -114,5 +114,12 @@ public class BottingScoreService {
             log.info("Cleaned up {} entries for system {}.", cleanCount, systemId);
         }
         log.info("CleanUpSystemScores complete.");
+    }
+
+    public int getScoreOfSystem(final long systemId) {
+        final List<Integer> npcKills = statsRepository.findBySystemIdOrderByInstantAsc(systemId).stream()
+                .map(SolarSystemStats::getNpcKills)
+                .collect(Collectors.toList());
+        return getScore(npcKills);
     }
 }

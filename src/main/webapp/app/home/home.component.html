@@ -31,9 +31,9 @@
             <h2>Your Status</h2>
             <p>
                 Tracking:
-                <span *ngIf="account.trackingStatus === 'ENABLED'" [ngClass]="status">{{status}}</span> <span *ngIf="isOwnSov">(you're in friendly space)</span>
+                <span *ngIf="account.trackingStatus === 'ENABLED'" [ngClass]="status">{{status}}</span> <span *ngIf="system && system.inOwnSov">(you're in friendly space)</span>
                 <span *ngIf="account.trackingStatus === 'DISABLED'" class="inactive">disabled</span>
-                <span *ngIf="account.trackingStatus === 'ENABLED' && status === 'active'">({{system}})</span>
+                <span *ngIf="account.trackingStatus === 'ENABLED' && status === 'active'">({{system.name}}, rating: {{system.score}})</span>
             </p>
             <div class="alert alert-warning" *ngIf="account.trackingStatus === 'DISABLED'">Please visit Account > Tracking to enable tracking.</div>
             <div class="alert alert-warning" *ngIf="account.trackingStatus === 'ENABLED' && status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking. Friendly space doesn't count.</div>
