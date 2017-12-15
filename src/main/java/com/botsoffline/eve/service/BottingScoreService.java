@@ -23,6 +23,7 @@ import com.botsoffline.eve.web.dto.BottingScoreDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -91,6 +92,7 @@ public class BottingScoreService {
         return scoreRepository.findTop1ByOrderByDateDesc().getList();
     }
 
+    @Async
     public void cleanUpSystemScores() {
         final List<Long> systemIds = solarSystemRepository.findAll().stream().map(SolarSystem::getSystemId)
                 .collect(Collectors.toList());
