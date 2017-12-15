@@ -11,3 +11,5 @@ export * from './profiles/page-ribbon.component';
 export * from './profiles/profile.service';
 export * from './profiles/profile-info.model';
 export * from './layout-routing.module';
+export * from './legal/legal.component'
+export * from './legal/legal.route'

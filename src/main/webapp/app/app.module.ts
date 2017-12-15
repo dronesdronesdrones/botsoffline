@@ -16,13 +16,8 @@ import { PaginationConfig } from './blocks/config/uib-pagination.config';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
 
 import {
-    JhiMainComponent,
-    LayoutRoutingModule,
-    NavbarComponent,
-    FooterComponent,
-    ProfileService,
-    PageRibbonComponent,
-    ErrorComponent
+    JhiMainComponent, LayoutRoutingModule, NavbarComponent, FooterComponent, ProfileService, PageRibbonComponent,
+    ErrorComponent, LegalComponent
 } from './layouts';
 import {SsoComponent} from "./layouts/callback/sso.component";
 import {LoginComponent} from "./layouts/login/login.component";
@@ -46,7 +41,8 @@ import {LoginComponent} from "./layouts/login/login.component";
         PageRibbonComponent,
         FooterComponent,
         SsoComponent,
-        LoginComponent
+        LoginComponent,
+        LegalComponent
     ],
     providers: [
         ProfileService,
