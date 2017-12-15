@@ -2,12 +2,15 @@ package com.botsoffline.eve.service;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import io.github.jhipster.config.JHipsterConstants;
+
 @Component
-//@Profile(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
+@Profile(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
 public class TriggerMachine {
 
     private final SystemStatsLoader systemStatsLoader;
@@ -48,7 +51,7 @@ public class TriggerMachine {
     }
 
     @Async
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedDelay = 60000)
     public void initAffiliations() {
         userService.initAffiliations();
     }

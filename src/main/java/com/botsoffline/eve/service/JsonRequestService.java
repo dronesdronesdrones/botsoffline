@@ -259,4 +259,14 @@ public class JsonRequestService {
     private String extractRegionName(final JsonNode jsonNode) {
         return jsonNode.getObject().getString("name");
     }
+
+    boolean isTqOnline() {
+        final String url = String.format("%s/status/", ESI_BASE_URL);
+        try {
+            return get(url, null).asBinary().getStatus() < 500;
+        } catch (final UnirestException e) {
+            log.error("Failed to get TQ online status.", e);
+            return false;
+        }
+    }
 }

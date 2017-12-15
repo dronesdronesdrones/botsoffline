@@ -20,6 +20,7 @@ import com.botsoffline.eve.repository.CharacterSystemStatusRepository;
 import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.SolarSystemStatsRepository;
 import com.botsoffline.eve.web.dto.BottingScoreDTO;
+import com.codahale.metrics.annotation.Timed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public class BottingScoreService {
         this.characterSystemStatusRepository = characterSystemStatusRepository;
     }
 
+    @Timed
     public void update() {
         final Map<Long, String> systemNames = new HashMap<>();
         final Map<Long, String> systemRegionNames = new HashMap<>();

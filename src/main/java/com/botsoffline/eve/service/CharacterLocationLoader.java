@@ -66,6 +66,11 @@ public class CharacterLocationLoader {
 
     @Timed
     public void update() {
+        if (!requestService.isTqOnline()) {
+            log.info("TQ is offline.");
+            return;
+        }
+
         log.debug("Updating playerStats.");
         final Instant before = Instant.now();
         final List<SolarSystem> solarSystems = solarSystemRepository.findAll();
