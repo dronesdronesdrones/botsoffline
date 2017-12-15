@@ -9,7 +9,11 @@ package com.botsoffline.eve.domain;
 
 import java.time.Instant;
 
+import org.springframework.data.annotation.Id;
+
 public class SolarSystemStats {
+    @Id
+    private String id;
     private long systemId;
     private int shipKills;
     private int npcKills;
@@ -25,6 +29,14 @@ public class SolarSystemStats {
         this.npcKills = npcKills;
         this.podKills = podKills;
         instant = Instant.now();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
     }
 
     public long getSystemId() {

@@ -30,7 +30,7 @@ public class TriggerMachine {
     }
 
     @Async
-    @Scheduled(fixedDelay = 3_600_000L)
+    @Scheduled(cron = "0 30 * * * *")
     public void loadSystemStats() {
         systemStatsLoader.update();
     }

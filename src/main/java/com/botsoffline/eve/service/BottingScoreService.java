@@ -1,5 +1,7 @@
 package com.botsoffline.eve.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,10 +21,14 @@ import com.botsoffline.eve.repository.SolarSystemRepository;
 import com.botsoffline.eve.repository.SolarSystemStatsRepository;
 import com.botsoffline.eve.web.dto.BottingScoreDTO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BottingScoreService {
+
+    private final Logger log = LoggerFactory.getLogger(BottingScoreService.class);
 
     private final SolarSystemStatsRepository statsRepository;
     private final SolarSystemRepository solarSystemRepository;
@@ -83,5 +89,26 @@ public class BottingScoreService {
 
     List<BottingScoreEntry> getLatest() {
         return scoreRepository.findTop1ByOrderByDateDesc().getList();
+    }
+
+    public void cleanUpSystemScores() {
+        final List<Long> systemIds = solarSystemRepository.findAll().stream().map(SolarSystem::getSystemId)
+                .collect(Collectors.toList());
+        for (final long systemId : systemIds) {
+            int cleanCount = 0;
+            final List<SolarSystemStats> stats = statsRepository.findBySystemIdOrderByInstantAsc(systemId);
+            int latestHour = 0;
+            for (final SolarSystemStats stat : stats) {
+                final int hour = LocalDateTime.ofInstant(stat.getInstant(), ZoneId.systemDefault()).getHour();
+                if (latestHour == hour) {
+                    cleanCount++;
+                    statsRepository.delete(stat);
+                } else {
+                    latestHour = hour;
+                }
+            }
+            log.info("Cleaned up {} entries for system {}.", cleanCount, systemId);
+        }
+        log.info("CleanUpSystemScores complete.");
     }
 }
