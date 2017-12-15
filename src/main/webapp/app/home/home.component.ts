@@ -23,6 +23,9 @@ export class HomeComponent implements OnInit {
     myScore: number;
     isOwnSov: boolean;
 
+    localScan: string;
+    localScanSubmitSuccessful: boolean;
+
     constructor(
         private principal: Principal,
         private eventManager: JhiEventManager,
@@ -89,6 +92,16 @@ export class HomeComponent implements OnInit {
 
     isAuthenticated() {
         return this.principal.isAuthenticated();
+    }
+
+    submitLocalScan() {
+        this.localScanSubmitSuccessful = false;
+        if (this.localScan) {
+            this.http.post('api/local-scan', this.localScan).subscribe((data) => {
+                this.localScan = null;
+                this.localScanSubmitSuccessful = true;
+            }, (err) => alert('Failed to submit local scan. Please try again later.'));
+        }
     }
 
 }

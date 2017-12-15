@@ -39,6 +39,16 @@
             <div class="alert alert-warning" *ngIf="account.trackingStatus === 'ENABLED' && status === 'inactive'">Please get into a neutral or hostile nullsec system to activate the tracking. Friendly space doesn't count.</div>
             <p *ngIf="rankInSystem">You are the {{rankInSystem}}. in system. <span *ngIf="rankInSystem > 1 && rankInSystem <= 4">You're getting {{30*(rankInSystem-1)}}% less points.</span><b *ngIf="rankInSystem > 4">You're not getting any points here, please choose another system!</b></p>
             <p *ngIf="totalMinutes">You have been preventing the botting menace for <span *ngIf="totalMinutes < 60">{{totalMinutes}} minutes</span><span *ngIf="totalMinutes >= 60">a total of <b>{{totalMinutes / 60 | number:'1.0-1'}}</b> hours</span>.</p>
+            <div>
+                <h3>Local Scan</h3>
+                <p>Please help us tracking down bots by pasting characters in local into this box. We will then evaluate their zkill history. Hourly is plenty.</p>
+                <div class="input-group">
+                    <textarea class="form-control" rows="4" [(ngModel)]="localScan"></textarea>
+                    <span class="input-group-addon btn btn-primary" (click)="submitLocalScan()">Submit</span>
+                    <span class="input-group-addon bg-success" *ngIf="localScanSubmitSuccessful"><i class="fa fa-check" style="color: #fff"></i></span>
+                </div>
+            </div>
+            <br/>
         </div>
     </div>
     <div class="col-md-6">
