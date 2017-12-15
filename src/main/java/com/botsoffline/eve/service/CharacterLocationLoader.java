@@ -122,9 +122,10 @@ public class CharacterLocationLoader {
     private int getScoreForPlayer(final long characterId, final int score) {
         try {
             final int rank = characterSystemStatusService.getRankInSystem(characterId);
-            // subtract 30% from the score for each rank behind the first rank
+            // subtract 30% from the score for each rank behind the first rank, bottom out at 0
             // divide by 100, to remove the inflated value of the system score
-            return (int) ((score / 100) * (1.0 - (0.3 * (rank - 1))));
+            final double modifier = 1.0 - (0.3 * (rank - 1));
+            return (int) ((score / 100.0) * (modifier > 0 ? modifier : 0));
         } catch (final NoPendingSystemStatusFoundException e) {
             log.info("No pending system could be found for character {} while adding scores.", characterId);
             return 0;
