@@ -72,7 +72,7 @@ public class BottingScoreService {
         scoreRepository.save(new BottingScore(bottingScores));
     }
 
-    private int getScore(final List<Integer> npcKills) {
+    private int getScore(final Collection<Integer> npcKills) {
         final long totalKills = npcKills.stream().mapToLong(i -> i).sum();
         final long averageKills = totalKills / npcKills.size();
         final long totalDelta = npcKills.stream().mapToLong(i -> Math.abs(i - averageKills)).sum();
@@ -81,11 +81,12 @@ public class BottingScoreService {
 
     public List<BottingScoreDTO> getLatest(final int start, final int end) {
         List<CharacterSystemStatus> activeCharacters = characterSystemStatusRepository.findAllByEndIsNull();
-        return scoreRepository.findTop1ByOrderByDateDesc().getList().subList(0, 100).stream()
+        return scoreRepository.findTop1ByOrderByDateDesc().getList().subList(start, end).stream()
                 .map(e -> toBottingScoreDTO(e, activeCharacters)).collect(Collectors.toList());
     }
 
-    private BottingScoreDTO toBottingScoreDTO(final BottingScoreEntry entry, final Collection<CharacterSystemStatus> activeCharacters) {
+    private BottingScoreDTO toBottingScoreDTO(final BottingScoreEntry entry,
+            final Collection<CharacterSystemStatus> activeCharacters) {
         final int count = (int) activeCharacters.stream().filter(a -> a.getSystemId() == entry.getSystemId()).count();
         return new BottingScoreDTO(entry.getSystemName(), entry.getRegionName(), entry.getScore(), count);
     }

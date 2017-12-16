@@ -30,6 +30,12 @@ public class TriggerMachine {
     }
 
     @Async
+    @Scheduled(cron = "0 */15 * * * *")
+    public void updateBottingScores() {
+        bottingScoreService.update();
+    }
+
+    @Async
     @Scheduled(cron = "0 30 * * * *")
     public void loadSystemStats() {
         systemStatsLoader.update();
@@ -57,12 +63,6 @@ public class TriggerMachine {
     @Scheduled(cron = "0 0 0 * * *")
     public void updateAffiliations() {
         userService.updateAffiliations();
-    }
-
-    @Async
-    @Scheduled(cron = "0 0 11 * * *")
-    public void updateBottingScores() {
-        bottingScoreService.update();
     }
 
 }
