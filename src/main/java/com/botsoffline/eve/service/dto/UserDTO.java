@@ -38,7 +38,10 @@ public class UserDTO {
     private Instant lastModifiedDate;
 
     private Set<String> authorities;
+
     private TrackingStatus trackingStatus;
+
+    private boolean hideFromLeaderboard;
 
     public UserDTO() {
         // Empty constructor needed for Jackson.
@@ -48,12 +51,12 @@ public class UserDTO {
         this(user.getId(), user.getLogin(), user.getActivated(),
             user.getCreatedBy(), user.getCreatedDate(), user.getLastModifiedBy(), user.getLastModifiedDate(),
             user.getAuthorities().stream().map(Authority::getName)
-                .collect(Collectors.toSet()), user.getTrackingStatus());
+                .collect(Collectors.toSet()), user.getTrackingStatus(), user.getHideFromLeaderboard());
     }
 
     public UserDTO(String id, String login, boolean activated,
         String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate,
-        Set<String> authorities, TrackingStatus trackingStatus) {
+        Set<String> authorities, TrackingStatus trackingStatus, boolean hideFromLeaderboard) {
 
         this.id = id;
         this.login = login;
@@ -64,6 +67,15 @@ public class UserDTO {
         this.lastModifiedDate = lastModifiedDate;
         this.authorities = authorities;
         this.trackingStatus = trackingStatus;
+        this.hideFromLeaderboard = hideFromLeaderboard;
+    }
+
+    public boolean isHideFromLeaderboard() {
+        return hideFromLeaderboard;
+    }
+
+    public void setHideFromLeaderboard(final boolean hideFromLeaderboard) {
+        this.hideFromLeaderboard = hideFromLeaderboard;
     }
 
     public TrackingStatus getTrackingStatus() {
