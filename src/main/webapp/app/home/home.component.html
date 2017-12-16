@@ -55,7 +55,7 @@
     <div class="col-md-6">
         <h2>Leaderboard (7 days)</h2>
         <p *ngIf="account && myScore">Your score: {{myScore}}</p>
-        <div class="alert alert-warning" *ngIf="account.hideFromLeaderboard">You decided to not appear on the leaderboard. Go to Settings > Hide From Leaderboard to change this.</div>
+        <div class="alert alert-warning" *ngIf="account && account.hideFromLeaderboard">You decided to not appear on the leaderboard. Go to Settings > Hide From Leaderboard to change this.</div>
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
