@@ -41,12 +41,13 @@
             <p *ngIf="totalMinutes">You have been preventing the botting menace for <span *ngIf="totalMinutes < 60">{{totalMinutes}} minutes</span><span *ngIf="totalMinutes >= 60">a total of <b>{{totalMinutes / 60 | number:'1.0-1'}}</b> hours</span>.</p>
             <div>
                 <h3>Local Scan</h3>
-                <p>Please help us tracking down bots by pasting characters in local into this box. We will then evaluate their zkill history. Hourly is plenty.</p>
+                <p>Please help us tracking down bots by pasting characters in local into this box. We will then evaluate their zkill history. Please also let us know if local is empty in a system you've been camping for a while. 100 points every hour for local scans.</p>
                 <div class="input-group">
                     <textarea class="form-control" rows="4" [(ngModel)]="localScan"></textarea>
                     <span class="input-group-addon btn btn-primary" (click)="submitLocalScan()">Submit</span>
                     <span class="input-group-addon bg-success" *ngIf="localScanSubmitSuccessful"><i class="fa fa-check" style="color: #fff"></i></span>
                 </div>
+                <div class="alert alert-info" *ngIf="awardedLocalScanPoints">You just received 100 points! Next points are available in one hour.</div>
             </div>
             <br/>
         </div>
@@ -78,7 +79,7 @@
     <p>This list does not try to prove systems with bots, but provides candidates for you to camp and provide further information. The rating
     is produced by running the NPC kills through <a href="https://github.com/dronesdronesdrones/botsoffline/blob/ba1138cfb18c8123c7560aa4d012056417e67578/src/main/java/com/botsoffline/eve/service/BottingScoreService.java#L58-L63">a score algorithm</a>. The higher the score, the higher the probability of bots. This list will
        contain false positives.</p>
-    <p>Got feedback or ideas for improvement? Let us know by joining the discussion on <a href="https://forums.eveonline.com/t/botsoffline-com-an-attempt-to-fight-ratting-bots/45697">the official forums</a>.</p>
+    <p>Got feedback or ideas for improvement, how can we help blackops groups? Let us know by joining the discussion on <a href="https://forums.eveonline.com/t/botsoffline-com-an-attempt-to-fight-ratting-bots/45697">the official forums</a>.</p>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

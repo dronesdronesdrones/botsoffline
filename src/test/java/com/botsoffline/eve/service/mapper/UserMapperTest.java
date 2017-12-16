@@ -60,7 +60,7 @@ public class UserMapperTest {
                 DEFAULT_LOGIN,
                 null,
                 Stream.of(AuthoritiesConstants.USER).collect(Collectors.toSet()),
-                TrackingStatus.ENABLED);
+                TrackingStatus.ENABLED, false);
         User user = sut.userDTOToUser(userDTO);
         assertThat(user.getId()).isEqualTo(DEFAULT_ID);
         assertThat(user.getLogin()).isEqualTo(DEFAULT_LOGIN);

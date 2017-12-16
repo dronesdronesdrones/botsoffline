@@ -152,7 +152,7 @@ public class UserResourceIntTest {
                 updatedUser.getCreatedDate(),
                 updatedUser.getLastModifiedBy(),
                 updatedUser.getLastModifiedDate(),
-                authorities, TrackingStatus.ENABLED);
+                authorities, TrackingStatus.ENABLED, false);
 
         restUserMockMvc.perform(put("/api/users")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -184,7 +184,7 @@ public class UserResourceIntTest {
             updatedUser.getCreatedDate(),
             updatedUser.getLastModifiedBy(),
             updatedUser.getLastModifiedDate(),
-            authorities, TrackingStatus.ENABLED);
+            authorities, TrackingStatus.ENABLED, false);
 
         restUserMockMvc.perform(put("/api/users")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -221,7 +221,7 @@ public class UserResourceIntTest {
             updatedUser.getCreatedDate(),
             updatedUser.getLastModifiedBy(),
             updatedUser.getLastModifiedDate(),
-            authorities, TrackingStatus.ENABLED);
+            authorities, TrackingStatus.ENABLED, false);
 
         restUserMockMvc.perform(put("/api/users")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)

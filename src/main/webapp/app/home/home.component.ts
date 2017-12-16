@@ -21,10 +21,10 @@ export class HomeComponent implements OnInit {
     candidates: any[];
     highscore: any[];
     myScore: number;
-    isOwnSov: boolean;
 
     localScan: string;
     localScanSubmitSuccessful: boolean;
+    awardedLocalScanPoints: boolean;
 
     constructor(
         private principal: Principal,
@@ -94,11 +94,15 @@ export class HomeComponent implements OnInit {
     }
 
     submitLocalScan() {
+        this.awardedLocalScanPoints = false;
         this.localScanSubmitSuccessful = false;
         if (this.localScan) {
             this.http.post('api/local-scan', this.localScan).subscribe((data) => {
                 this.localScan = null;
                 this.localScanSubmitSuccessful = true;
+                if (data.status === 201) {
+                    this.awardedLocalScanPoints = true;
+                }
             }, (err) => alert('Failed to submit local scan. Please try again later.'));
         }
     }

@@ -24,8 +24,9 @@ public class ManagedUserVM extends UserDTO {
 
     public ManagedUserVM(String id, String login, boolean activated,
                          String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate,
-                        Set<String> authorities, TrackingStatus trackingStatus) {
-        super(id, login, activated, createdBy, createdDate, lastModifiedBy, lastModifiedDate,  authorities, trackingStatus);
+                        Set<String> authorities, TrackingStatus trackingStatus, final boolean hideFromLeaderboard) {
+        super(id, login, activated, createdBy, createdDate, lastModifiedBy, lastModifiedDate,  authorities,
+              trackingStatus, hideFromLeaderboard);
     }
 
     @Override
