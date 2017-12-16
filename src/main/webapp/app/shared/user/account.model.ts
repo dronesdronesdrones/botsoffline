@@ -3,5 +3,6 @@ export class Account {
         public activated: boolean,
         public authorities: string[],
         public login: string,
+        public hideFromLeaderboard: boolean
     ) { }
 }
