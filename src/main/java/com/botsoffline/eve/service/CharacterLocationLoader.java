@@ -184,6 +184,9 @@ public class CharacterLocationLoader {
             return null;
         }
         final CharacterLocation location = requestService.getLocation(characterId, accessToken);
+        if (null == location) {
+            return null;
+        }
         characterSystemStatusService.createOrUpdate(characterId, location.getSystemId());
         return location;
     }
