@@ -11,4 +11,6 @@ public interface CharacterScoreRepository extends MongoRepository<CharacterScore
     List<CharacterScore> findAllByInstantAfterAndCharacterIdNotIn(Instant instant, List<Long> characterIds);
 
     List<CharacterScore> findAllByInstantAfterAndCharacterId(Instant instant, Long characterId);
+
+    CharacterScore findTop1ByCharacterIdAndScoreOrderByInstantDesc(long characterId, int score);
 }

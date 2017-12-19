@@ -40,11 +40,13 @@ public class LocalScanResource {
 
     @PostMapping
     public ResponseEntity postSolarScan(@RequestBody final String payload) {
-        final String user = SecurityUtils.getCurrentUserLogin();
-        final LocalScan scan = scanRepo.findTop1ByUserOrderByInstantDesc(user);
-        scanRepo.save(new LocalScan(user, payload));
-        if (null == scan || scan.getInstant().until(Instant.now(), ChronoUnit.HOURS) >= 1) {
-            addPoints(user);
+        final String login = SecurityUtils.getCurrentUserLogin();
+        final User user = userRepository.findByLogin(login);
+        final CharacterScore score = characterScoreRepository
+                .findTop1ByCharacterIdAndScoreOrderByInstantDesc(user.getCharacterId(), 100);
+        scanRepo.save(new LocalScan(login, payload));
+        if (null == score || score.getInstant().until(Instant.now(), ChronoUnit.HOURS) >= 1) {
+            addPoints(user.getCharacterId());
             return ResponseEntity.status(201).build();
         } else {
             return ResponseEntity.ok().build();
@@ -52,9 +54,8 @@ public class LocalScanResource {
     }
 
     @Async
-    private void addPoints(final String userName) {
-        final User user = userRepository.findByLogin(userName);
-        characterScoreRepository.save(new CharacterScore(user.getCharacterId(), -1L, 100));
-        log.info("Awarded local scan points to {}.", user);
+    private void addPoints(final long characterId) {
+        characterScoreRepository.save(new CharacterScore(characterId, -1L, 100));
+        log.info("Awarded local scan points to {}.", characterId);
     }
 }
