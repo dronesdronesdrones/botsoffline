@@ -157,14 +157,30 @@ public class JsonRequestService {
     }
 
     public List<SolarSystemStats> getSolarSystemStats() {
-        final Optional<JsonNode> jsonNode = justGet(ESI_BASE_URL + "/v2/universe/system_kills/");
+        final Optional<JsonNode> jsonNodeJumps = justGet(ESI_BASE_URL + "/v1/universe/system_jumps/");
+        final Map<Long, Integer> jumps = new HashMap<>();
+        if (jsonNodeJumps.isPresent()) {
+            final JSONArray jumpsArray = jsonNodeJumps.get().getArray();
+            for (int i = 0; i < jumpsArray.length(); i++) {
+                final JSONObject obj = jumpsArray.getJSONObject(i);
+                final long systemId = obj.getLong("system_id");
+                final int shipJumps = obj.getInt("ship_jumps");
+                jumps.put(systemId, shipJumps);
+            }
+        }
+
+        final Optional<JsonNode> jsonNodeKills = justGet(ESI_BASE_URL + "/v2/universe/system_kills/");
+
         final List<SolarSystemStats> result = new ArrayList<>();
-        if (jsonNode.isPresent()) {
-            final JSONArray array = jsonNode.get().getArray();
-            for (int i = 0; i < array.length(); i++) {
-                final JSONObject obj = array.getJSONObject(i);
-                result.add(new SolarSystemStats(obj.getLong("system_id"), obj.getInt("ship_kills"),
-                                                obj.getInt("npc_kills"), obj.getInt("pod_kills")));
+        if (jsonNodeKills.isPresent()) {
+            final JSONArray killArray = jsonNodeKills.get().getArray();
+            for (int i = 0; i < killArray.length(); i++) {
+                final JSONObject killStats = killArray.getJSONObject(i);
+                final long systemId = killStats.getLong("system_id");
+                final SolarSystemStats stats = new SolarSystemStats(systemId, killStats.getInt("ship_kills"),
+                                                          killStats.getInt("npc_kills"), killStats.getInt("pod_kills"),
+                                                          jumps.getOrDefault(systemId, 0));
+                result.add(stats);
             }
         } else {
             log.warn("Failed to load solarSystemStats.");

@@ -1,7 +1,9 @@
 package com.botsoffline.eve.service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -55,16 +57,16 @@ public class BottingScoreService {
         systems.forEach(system -> systemNames.put(system.getSystemId(), system.getName()));
         systems.forEach(system -> systemRegionNames.put(system.getSystemId(), system.getRegionName()));
         final List<SolarSystemStats> allStats = statsRepository.findAll();
-        final Map<Long, List<Integer>> dataPerSystem = new HashMap<>();
+        final Map<Long, List<SolarSystemStats>> dataPerSystem = new HashMap<>();
         for (final SolarSystemStats stats : allStats) {
             final long systemId = stats.getSystemId();
             if (!dataPerSystem.containsKey(systemId)) {
                 dataPerSystem.put(systemId, new ArrayList<>());
             }
-            dataPerSystem.get(systemId).add(stats.getNpcKills());
+            dataPerSystem.get(systemId).add(stats);
         }
         final List<BottingScoreEntry> bottingScores = new ArrayList<>();
-        for (final Entry<Long, List<Integer>> entry : dataPerSystem.entrySet()) {
+        for (final Entry<Long, List<SolarSystemStats>> entry : dataPerSystem.entrySet()) {
             final long systemid = entry.getKey();
             bottingScores.add(new BottingScoreEntry(systemid, systemNames.get(systemid), systemRegionNames.get(systemid), getScore(entry.getValue())));
         }
@@ -72,15 +74,24 @@ public class BottingScoreService {
         scoreRepository.save(new BottingScore(bottingScores));
     }
 
-    private int getScore(final Collection<Integer> npcKills) {
-        final long totalKills = npcKills.stream().mapToLong(i -> i).sum();
-        final long averageKills = totalKills / npcKills.size();
-        final long totalDelta = npcKills.stream().mapToLong(i -> Math.abs(i - averageKills)).sum();
-        return (int) (totalKills / (totalDelta / 100));
+    /** stats must be sorted by instant asc
+     * @param stats**/
+    private int getScore(final List<SolarSystemStats> stats) {
+        final long pvpKills = stats.stream().mapToLong(SolarSystemStats::getShipKills).sum();
+        final long npcKills = stats.stream().mapToLong(SolarSystemStats::getNpcKills).sum();
+        final long averageKills = (int) (npcKills / stats.size());
+        final long npcDelta = stats.stream().mapToLong(SolarSystemStats::getNpcKills)
+                .map(l -> Math.abs(l - averageKills)).sum();
+
+        final int pvpModifier = (int) (pvpKills * 5);
+        int score = (int) (npcKills / (npcDelta / 100.0));
+        score = pvpModifier >= score ? 0 : score - pvpModifier;
+        log.debug("Score {}, PvP Kills {}", score, pvpKills);
+        return score;
     }
 
     public List<BottingScoreDTO> getLatest(final int start, final int end) {
-        List<CharacterSystemStatus> activeCharacters = characterSystemStatusRepository.findAllByEndIsNull();
+        final List<CharacterSystemStatus> activeCharacters = characterSystemStatusRepository.findAllByEndIsNull();
         return scoreRepository.findTop1ByOrderByDateDesc().getList().subList(start, end).stream()
                 .map(e -> toBottingScoreDTO(e, activeCharacters)).collect(Collectors.toList());
     }
@@ -118,8 +129,7 @@ public class BottingScoreService {
     }
 
     public int getScoreOfSystem(final long systemId) {
-        final List<Integer> npcKills = statsRepository.findBySystemIdOrderByInstantAsc(systemId).stream()
-                .map(SolarSystemStats::getNpcKills)
+        final List<SolarSystemStats> npcKills = statsRepository.findBySystemIdAndInstantAfterOrderByInstantAsc(systemId, Instant.now().minus(10, ChronoUnit.DAYS)).stream()
                 .collect(Collectors.toList());
         return getScore(npcKills);
     }

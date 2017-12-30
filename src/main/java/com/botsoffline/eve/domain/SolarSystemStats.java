@@ -18,17 +18,27 @@ public class SolarSystemStats {
     private int shipKills;
     private int npcKills;
     private int podKills;
+    private int jumps;
     private Instant instant;
 
     public SolarSystemStats() {
     }
 
-    public SolarSystemStats(final long systemId, final int shipKills, final int npcKills, final int podKills) {
+    public SolarSystemStats(final long systemId, final int shipKills, final int npcKills, final int podKills, final int jumps) {
         this.systemId = systemId;
         this.shipKills = shipKills;
         this.npcKills = npcKills;
         this.podKills = podKills;
+        this.jumps = jumps;
         instant = Instant.now();
+    }
+
+    public int getJumps() {
+        return jumps;
+    }
+
+    public void setJumps(final int jumps) {
+        this.jumps = jumps;
     }
 
     public String getId() {
